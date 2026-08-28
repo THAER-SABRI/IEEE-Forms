@@ -15,6 +15,7 @@
   --w:#fff;
   --b:#090c12;
   --blue:#075ee8;
+  --red:#c81717;
 }
 
 *{
@@ -680,17 +681,32 @@ select:focus{
   border:1px solid rgba(7,94,232,.16);
   background:rgba(7,94,232,.045);
 }
-.registered-email{
-  margin-top:13px;
-  padding:10px;
-  direction:ltr;
+.success-note{
+  margin-top:15px;
+  padding:11px 13px;
   color:var(--blue);
-  font-size:13px;
+  font-size:12px;
   font-weight:900;
   border:1px solid rgba(7,94,232,.14);
-  border-radius:10px;
-  background:rgba(7,94,232,.035);
-  overflow-wrap:anywhere;
+  border-radius:11px;
+  background:rgba(7,94,232,.045);
+}
+
+.submit-loading{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+
+.submit-loading::before{
+  content:"";
+  width:14px;
+  height:14px;
+  border:2px solid rgba(255,255,255,.45);
+  border-top-color:#fff;
+  border-radius:50%;
+  animation:spin .65s linear infinite;
 }
 
 /* FOOTER */
@@ -723,7 +739,7 @@ footer strong{
 
 .success-box{
   width:min(100%,480px);
-  padding:32px 20px;
+  padding:36px 22px;
   text-align:center;
   border:1px solid rgba(7,94,232,.15);
   border-radius:20px;
@@ -754,8 +770,17 @@ footer strong{
 
 .success h2{
   direction:ltr;
-  font-size:22px;
+  font-size:24px;
   font-weight:900;
+}
+
+.success-kicker{
+  display:inline-block;
+  margin-bottom:8px;
+  color:var(--blue);
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.8px;
 }
 
 .success h2 span{
@@ -857,6 +882,10 @@ footer strong{
 @keyframes show{
   from{opacity:0;transform:translateY(-4px)}
   to{opacity:1;transform:none}
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg)}
 }
 
 @media(prefers-reduced-motion:reduce){
@@ -1268,6 +1297,7 @@ footer strong{
               type="radio"
               value="2"
               required
+              checked
             >
 
             <label for="two">
@@ -1301,7 +1331,7 @@ footer strong{
 
     <!-- SECOND MEMBER -->
 
-    <div class="member" id="member2Box">
+    <div class="member show" id="member2Box">
 
       <label>
         اسم العضو الثاني
@@ -1314,7 +1344,7 @@ footer strong{
         type="text"
         maxlength="60"
         placeholder="الاسم الكامل للعضو الثاني"
-        disabled
+        required
       >
 
     </div>
@@ -1403,16 +1433,18 @@ footer strong{
 
     <div class="check"></div>
 
+    <span class="success-kicker">REGISTRATION COMPLETE</span>
+
     <h2>
       TEAM <span>REGISTERED.</span>
     </h2>
 
     <p id="successText">
-      تم تسجيل فريقكم بنجاح.
-      نتمنى لكم التوفيق في المسابقة.
+      شكراً لتسجيلكم! تم اعتماد مشاركتكم في المسابقة.
+      نتمنى لكم تجربة قوية وموفقة.
     </p>
 
-    <div class="registered-email" id="registeredEmail"></div>
+    <div class="success-note">تم استلام التسجيل بنجاح ✓</div>
 
   </div>
 
@@ -1425,10 +1457,11 @@ footer strong{
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMFUEUcNulF0sGDZRErJ5wDdP4W2jhvfobbH4EcZx_53-jxy4pUfmdS5XOJaxjqbTNSw/exec";
 const DEVICE_KEY = "psc_device_id_v5";
 const LOCK_KEY = "psc_registration_lock_v5";
-const STATUS_TIMEOUT = 10000;
+const COOKIE_LOCK = "psc_registered_v5";
+const LOADING_TIME = 1000;
+const QUICK_CHECK_TIMEOUT = 650;
 
 const $ = id => document.getElementById(id);
-
 const form = $("registrationForm");
 const mainView = $("mainView");
 const successView = $("successView");
@@ -1436,7 +1469,6 @@ const submitButton = $("submitButton");
 const submitText = $("submitText");
 const formMessage = $("formMessage");
 const successText = $("successText");
-const registeredEmail = $("registeredEmail");
 const member2 = $("member2");
 const member3 = $("member3");
 const member2Box = $("member2Box");
@@ -1444,11 +1476,11 @@ const member3Box = $("member3Box");
 
 const trimValue = value => String(value ?? "").trim();
 const normalizeEmail = value => trimValue(value).toLowerCase();
+const sleep = ms => new Promise(resolve => setTimeout(resolve,ms));
 
 function toEnglishDigits(value){
   const arabic = "٠١٢٣٤٥٦٧٨٩";
   const persian = "۰۱۲۳۴۵۶۷۸۹";
-
   return String(value ?? "")
     .replace(/[٠-٩]/g,d => arabic.indexOf(d))
     .replace(/[۰-۹]/g,d => persian.indexOf(d));
@@ -1462,11 +1494,7 @@ function normalizePhone(value){
 
 function validEmail(email){
   const parts = email.split("@");
-  return parts.length === 2 &&
-    parts[0] &&
-    parts[1] &&
-    !email.includes(" ") &&
-    email.length <= 150;
+  return parts.length === 2 && parts[0] && parts[1] && !email.includes(" ") && email.length <= 150;
 }
 
 function validPhone(phone){
@@ -1485,33 +1513,69 @@ function clearMessage(){
 
 function newId(){
   if(crypto.randomUUID) return crypto.randomUUID();
-
   return [...crypto.getRandomValues(new Uint8Array(16))]
     .map(b => b.toString(16).padStart(2,"0"))
     .join("");
 }
 
-function getDeviceId(){
-  let id = localStorage.getItem(DEVICE_KEY);
+function getCookie(name){
+  const item = document.cookie
+    .split("; ")
+    .find(row => row.startsWith(name + "="));
+  return item ? item.split("=").slice(1).join("=") : "";
+}
 
+function setRegistrationCookie(){
+  document.cookie = `${COOKIE_LOCK}=1; Max-Age=315360000; Path=/; SameSite=Lax`;
+}
+
+async function getDeviceId(){
+  const signature = [
+    navigator.userAgent || "",
+    navigator.platform || "",
+    navigator.language || "",
+    Intl.DateTimeFormat().resolvedOptions().timeZone || "",
+    screen.width || 0,
+    screen.height || 0,
+    screen.colorDepth || 0,
+    window.devicePixelRatio || 1,
+    navigator.hardwareConcurrency || 0,
+    navigator.deviceMemory || 0,
+    navigator.maxTouchPoints || 0
+  ].join("|");
+
+  try{
+    if(crypto.subtle){
+      const bytes = new TextEncoder().encode(signature);
+      const digest = await crypto.subtle.digest("SHA-256",bytes);
+      const id = "fp_" + [...new Uint8Array(digest)]
+        .map(b => b.toString(16).padStart(2,"0"))
+        .join("");
+      localStorage.setItem(DEVICE_KEY,id);
+      return id;
+    }
+  }catch{}
+
+  let id = localStorage.getItem(DEVICE_KEY);
   if(!id){
     id = newId();
     localStorage.setItem(DEVICE_KEY,id);
   }
-
   return id;
 }
 
 function getLocalRegistration(){
   try{
-    return JSON.parse(localStorage.getItem(LOCK_KEY) || "null");
-  }catch{
-    return null;
-  }
+    const saved = JSON.parse(localStorage.getItem(LOCK_KEY) || "null");
+    if(saved) return saved;
+  }catch{}
+
+  return getCookie(COOKIE_LOCK) === "1" ? {registered:true} : null;
 }
 
-function saveLocalRegistration(data){
-  localStorage.setItem(LOCK_KEY,JSON.stringify(data));
+function saveLocalRegistration(data={}){
+  localStorage.setItem(LOCK_KEY,JSON.stringify({registered:true,...data}));
+  setRegistrationCookie();
 }
 
 function updateTeamFields(){
@@ -1521,7 +1585,6 @@ function updateTeamFields(){
 
   member2Box.classList.toggle("show",show2);
   member3Box.classList.toggle("show",show3);
-
   member2.disabled = !show2;
   member2.required = show2;
   member3.disabled = !show3;
@@ -1531,14 +1594,12 @@ function updateTeamFields(){
   if(!show3) member3.value = "";
 }
 
-form.TeamSize.forEach(radio =>
-  radio.addEventListener("change",updateTeamFields)
-);
+form.TeamSize.forEach(radio => radio.addEventListener("change",updateTeamFields));
 
-function buildPayload(){
+function buildPayload(deviceId){
   const data = {
     RequestId:newId(),
-    DeviceId:getDeviceId(),
+    DeviceId:deviceId,
     FullName:trimValue(form.FullName.value),
     Major:trimValue(form.Major.value),
     Year:form.Year.value,
@@ -1572,7 +1633,7 @@ function buildPayload(){
   }
 
   if(!validPhone(data.Phone))
-    throw new Error("اكتب رقم واتساب صحيحًا. يمكن استخدام أي مقدمة دولة.");
+    throw new Error("اكتب رقم واتساب صحيحًا مع مقدمة الدولة.");
 
   if(!validEmail(data.Email))
     throw new Error("اكتب بريدًا إلكترونيًا صحيحًا يحتوي على @.");
@@ -1583,8 +1644,7 @@ function buildPayload(){
   if(data.TeamSize === "3" && !data.Member3)
     throw new Error("اكتب اسم العضو الثالث.");
 
-  if(data.TeamSize === "2")
-    data.Member3 = "";
+  if(data.TeamSize === "2") data.Member3 = "";
 
   if(data.Confirmation !== "Confirmed")
     throw new Error("يجب تأكيد صحة المعلومات والالتزام بالمشاركة.");
@@ -1592,7 +1652,7 @@ function buildPayload(){
   return data;
 }
 
-function jsonp(params,timeout=5000){
+function jsonp(params,timeout=QUICK_CHECK_TIMEOUT){
   return new Promise((resolve,reject) => {
     const callback = "__psc_" + Date.now().toString(36) + Math.random().toString(36).slice(2);
     const script = document.createElement("script");
@@ -1614,7 +1674,6 @@ function jsonp(params,timeout=5000){
     };
 
     const url = new URL(SCRIPT_URL);
-
     Object.entries({...params,callback})
       .forEach(([key,value]) => url.searchParams.set(key,String(value)));
 
@@ -1629,137 +1688,126 @@ function jsonp(params,timeout=5000){
   });
 }
 
-async function sendRegistration(payload){
-  await fetch(SCRIPT_URL,{
+function queueRegistration(payload){
+  const body = JSON.stringify(payload);
+
+  if(navigator.sendBeacon){
+    const blob = new Blob([body],{type:"text/plain;charset=UTF-8"});
+    if(navigator.sendBeacon(SCRIPT_URL,blob)) return;
+  }
+
+  fetch(SCRIPT_URL,{
     method:"POST",
     mode:"no-cors",
     cache:"no-store",
+    keepalive:true,
     headers:{"Content-Type":"text/plain;charset=utf-8"},
-    body:JSON.stringify(payload)
-  });
+    body
+  }).catch(error => console.error("Registration send failed:",error));
 }
 
-async function waitForStatus(RequestId){
-  const start = Date.now();
-
-  while(Date.now() - start < STATUS_TIMEOUT){
-    try{
-      const result = await jsonp({action:"status",RequestId},3500);
-
-      if(result?.status && result.status !== "pending")
-        return result;
-    }catch{}
-
-    await new Promise(resolve => setTimeout(resolve,650));
-  }
-
-  throw new Error("timeout");
-}
-
-function showSuccess(Email,already=false){
+function showSuccess(already=false){
   mainView.hidden = true;
   successView.hidden = false;
 
   successText.textContent = already
-    ? "هذا الجهاز مسجّل مسبقًا في المسابقة."
-    : "تم تسجيلكم بنجاح. نتمنى لكم التوفيق في المسابقة.";
-
-  registeredEmail.textContent =
-    Email ? `EMAIL: ${Email}` : "تم اعتماد التسجيل.";
+    ? "تم استخدام هذا الجهاز للتسجيل مسبقًا. التسجيل متاح مرة واحدة فقط لكل شخص."
+    : "شكراً لتسجيلكم! تم اعتماد مشاركتكم في المسابقة. نتمنى لكم تجربة قوية وموفقة.";
 
   window.scrollTo({top:0,behavior:"smooth"});
 }
 
-function showDuplicate(reason,Email){
+function showDuplicate(reason){
   const messages = {
-    device:"هذا الجهاز استُخدم للتسجيل مسبقًا.",
+    device:"هذا الجهاز استُخدم للتسجيل مسبقًا. التسجيل متاح مرة واحدة فقط.",
     phone:"رقم الواتساب هذا مسجّل مسبقًا.",
     email:"البريد الإلكتروني هذا مسجّل مسبقًا.",
     request:"هذا الطلب تم إرساله مسبقًا."
   };
-
-  setMessage(
-    `${messages[reason] || "يوجد تسجيل سابق بهذه البيانات."}${Email ? ` البريد: ${Email}` : ""}`
-  );
+  setMessage(messages[reason] || "يوجد تسجيل سابق بهذه البيانات.");
 }
 
 form.addEventListener("submit",async event => {
   event.preventDefault();
   clearMessage();
 
-  if(SCRIPT_URL.includes("PUT_YOUR")){
-    setMessage("ضع رابط Google Apps Script أولًا.");
-    return;
-  }
-
-  const previous = getLocalRegistration();
-
-  if(previous){
-    showSuccess(previous.Email || "",true);
+  if(getLocalRegistration()){
+    showSuccess(true);
     return;
   }
 
   let payload;
-
   try{
-    payload = buildPayload();
+    const deviceId = await getDeviceId();
+    payload = buildPayload(deviceId);
   }catch(error){
     setMessage(error.message);
     return;
   }
 
+  if(navigator.onLine === false){
+    setMessage("لا يوجد اتصال بالإنترنت. تأكد من الشبكة ثم حاول مرة أخرى.");
+    return;
+  }
+
+  const startedAt = performance.now();
   submitButton.disabled = true;
-  submitText.textContent = "VERIFYING...";
+  submitText.textContent = "جاري التسجيل...";
+  submitText.classList.add("submit-loading");
 
   try{
-    const precheck = await jsonp({
-      action:"check",
-      Email:payload.Email,
-      Phone:payload.Phone,
-      DeviceId:payload.DeviceId
-    });
-
-    if(precheck.status === "duplicate"){
-      showDuplicate(precheck.reason,payload.Email);
-      return;
-    }
-
-    submitText.textContent = "SENDING...";
-    await sendRegistration(payload);
-
-    const result = await waitForStatus(payload.RequestId);
-
-    if(result.status === "success"){
-      saveLocalRegistration({
+    let precheck = null;
+    try{
+      precheck = await jsonp({
+        action:"check",
         Email:payload.Email,
-        RegistrationId:result.RegistrationId || ""
+        Phone:payload.Phone,
+        DeviceId:payload.DeviceId
       });
+    }catch{}
 
-      showSuccess(payload.Email);
+    if(precheck?.status === "duplicate"){
+      if(precheck.reason === "device") saveLocalRegistration();
+      showDuplicate(precheck.reason);
       return;
     }
 
-    if(result.status === "duplicate"){
-      showDuplicate(result.reason,payload.Email);
-      return;
-    }
+    saveLocalRegistration({RequestId:payload.RequestId});
+    queueRegistration(payload);
 
-    setMessage(result.message || "تعذّر إكمال التسجيل. حاول مرة أخرى.");
+    const remaining = Math.max(0,LOADING_TIME - (performance.now() - startedAt));
+    if(remaining) await sleep(remaining);
+
+    showSuccess(false);
 
   }catch(error){
     console.error(error);
-    setMessage("تعذّر تأكيد التسجيل حاليًا. جرّب مرة أخرى.");
-
+    setMessage("تعذّر إرسال التسجيل حاليًا. جرّب مرة أخرى.");
   }finally{
     submitButton.disabled = false;
+    submitText.classList.remove("submit-loading");
     submitText.textContent = "REGISTER TEAM </>";
   }
 });
 
-const previous = getLocalRegistration();
-if(previous) showSuccess(previous.Email || "",true);
+async function checkExistingDevice(){
+  if(getLocalRegistration()){
+    showSuccess(true);
+    return;
+  }
+
+  try{
+    const DeviceId = await getDeviceId();
+    const result = await jsonp({action:"check",DeviceId},1200);
+    if(result?.status === "duplicate" && result.reason === "device"){
+      saveLocalRegistration();
+      showSuccess(true);
+    }
+  }catch{}
+}
 
 updateTeamFields();
+checkExistingDevice();
 </script>
 
 </body>
