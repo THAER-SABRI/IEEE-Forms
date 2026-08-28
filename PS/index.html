@@ -5,1577 +5,387 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#ffffff">
 <title>Problem Solving Competition</title>
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;600;700;800;900&display=swap" rel="stylesheet">
-
 <style>
-:root{
-  --w:#fff;
-  --b:#090c12;
-  --blue:#075ee8;
-  --red:#c81717;
-}
-
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
-
-html{
-  scroll-behavior:smooth;
-}
-
-body,input,select,button{
-  font-family:"Tajawal",sans-serif;
-}
-
-body{
-  min-height:100vh;
-  color:var(--b);
-  background:var(--w);
-  line-height:1.7;
-  overflow-x:hidden;
-}
-
-/* BACKGROUND */
-
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  z-index:-1;
-  background:
-    radial-gradient(circle at 5% 18%,rgba(7,94,232,.09),transparent 20%),
-    radial-gradient(circle at 96% 65%,rgba(7,94,232,.07),transparent 22%),
-    linear-gradient(rgba(7,94,232,.045) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(7,94,232,.045) 1px,transparent 1px);
-  background-size:auto,auto,44px 44px,44px 44px;
-}
-
-/* MAIN */
-
-.page{
-  width:min(calc(100% - 8px),700px);
-  margin:auto;
-  padding:4px 0 30px;
-}
-
-.hero,
-.card{
-  background:var(--w);
-  border:1px solid rgba(7,94,232,.15);
-  box-shadow:0 10px 28px rgba(9,12,18,.065);
-  backdrop-filter:saturate(120%);
-}
-
-.hero{
-  overflow:hidden;
-  margin-bottom:7px;
-  border-radius:17px;
-}
-
-/* BANNER */
-
-.banner img{
-  display:block;
-  width:100%;
-  height:auto;
-}
-
-/* CODE */
-
-.code-section{
-  padding:10px 10px 5px;
-  direction:ltr;
-}
-
-.editor{
-  width:min(100%,390px);
-  margin:auto;
-  overflow:hidden;
-  border:1px solid rgba(7,94,232,.18);
-  border-radius:12px;
-  background:var(--w);
-}
-
-.editor-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  height:25px;
-  padding:0 9px;
-  border-bottom:1px solid rgba(9,12,18,.07);
-}
-
-.dots{
-  display:flex;
-  gap:4px;
-}
-
-.dots i{
-  width:5px;
-  height:5px;
-  border-radius:50%;
-  background:var(--blue);
-}
-
-.dots i:nth-child(2){
-  background:var(--b);
-  opacity:.25;
-}
-
-.dots i:nth-child(3){
-  background:var(--b);
-}
-
-.editor-head span{
-  color:rgba(9,12,18,.45);
-  font:700 8px monospace;
-}
-
-.code-body{
-  padding:7px 9px 10px;
-  font-family:Consolas,monospace;
-}
-
-.code-line{
-  display:flex;
-  align-items:center;
-  min-height:23px;
-  font-size:clamp(9px,3vw,12px);
-  white-space:nowrap;
-}
-
-.line-number{
-  width:23px;
-  flex:none;
-  color:rgba(9,12,18,.24);
-  font-size:8px;
-}
-
-.blue{
-  color:var(--blue);
-}
-
-.include{
-  color:rgba(9,12,18,.48);
-}
-
-.typing{
-  display:inline-block;
-  width:0;
-  overflow:hidden;
-  color:var(--b);
-  font-weight:700;
-  white-space:nowrap;
-  border-right:2px solid var(--blue);
-
-  animation:
-    type 4.4s steps(25,end) infinite,
-    blink .55s step-end infinite;
-}
-
-/* HERO INFO */
-
-.hero-info{
-  padding:8px 11px 14px;
-}
-
-.description{
-  color:rgba(9,12,18,.68);
-  font-size:13px;
-  font-weight:600;
-  line-height:1.85;
-}
-
-.description strong{
-  color:var(--b);
-  font-weight:800;
-}
-
-
-.registration-notice{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  margin-top:11px;
-  padding:10px 11px;
-  border:1px solid rgba(7,94,232,.14);
-  border-radius:11px;
-  background:rgba(7,94,232,.035);
-}
-
-.registration-notice strong{
-  flex:none;
-  color:var(--blue);
-  font-size:11.5px;
-  font-weight:900;
-}
-
-.registration-notice span{
-  color:rgba(9,12,18,.65);
-  font-size:10.8px;
-  font-weight:700;
-  line-height:1.55;
-}
-
-@media(max-width:430px){
-  .registration-notice{
-    align-items:flex-start;
-    flex-wrap:wrap;
-    gap:3px 7px;
-  }
-}
-
-/* LOCATION */
-
-.location{
-  display:flex;
-  align-items:center;
-  gap:9px;
-  margin-top:11px;
-  padding:9px 10px;
-  border:1px solid rgba(7,94,232,.15);
-  border-radius:11px;
-  background:rgba(7,94,232,.035);
-}
-
-.pin{
-  position:relative;
-  width:34px;
-  height:34px;
-  min-width:34px;
-  border-radius:9px;
-  background:var(--blue);
-}
-
-.pin::after{
-  content:"";
-  position:absolute;
-  top:8px;
-  left:9px;
-  width:9px;
-  height:9px;
-  border:3px solid var(--w);
-  border-radius:50% 50% 50% 0;
-  transform:rotate(-45deg);
-}
-
-.location strong{
-  font-size:11.3px;
-  font-weight:800;
-}
-
-/* SCHEDULE */
-
-.schedule{
-  margin-top:11px;
-  padding:14px 9px 11px;
-  border:1px solid rgba(7,94,232,.14);
-  border-radius:13px;
-}
-
-.schedule h3{
-  margin-bottom:12px;
-  text-align:center;
-  font-size:17px;
-  font-weight:900;
-  line-height:1.4;
-}
-
-.timeline{
-  position:relative;
-  display:grid;
-  gap:6px;
-}
-
-.timeline::before{
-  content:"";
-  position:absolute;
-  top:17px;
-  right:16px;
-  bottom:17px;
-  width:2px;
-  background:rgba(7,94,232,.14);
-}
-
-.step{
-  position:relative;
-  z-index:1;
-  display:grid;
-  grid-template-columns:36px minmax(0,1fr);
-  align-items:center;
-  gap:8px;
-}
-
-.step-number{
-  display:grid;
-  place-items:center;
-  width:36px;
-  height:36px;
-  color:var(--w);
-  font-size:10.5px;
-  font-weight:900;
-  border-radius:50%;
-  background:var(--blue);
-  box-shadow:0 0 0 4px var(--w);
-}
-
-.step-content{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) auto;
-  align-items:center;
-  gap:9px;
-  min-height:59px;
-  padding:9px 10px;
-  border:1px solid rgba(9,12,18,.075);
-  border-radius:10px;
-  background:var(--w);
-}
-
-.step-content strong{
-  font-size:clamp(13px,3.6vw,14.5px);
-  font-weight:800;
-  line-height:1.5;
-}
-
-/*
-  START TIME = RIGHT
-  END TIME = LEFT
-*/
-
-.time{
-  display:flex;
-  flex-direction:row-reverse;
-  align-items:center;
-  gap:6px;
-  color:var(--blue);
-  font-size:clamp(13.5px,3.8vw,15px);
-  font-weight:900;
-  direction:ltr;
-  white-space:nowrap;
-}
-
-.time b{
-  font-size:18px;
-  line-height:1;
-}
-
-
-/* FEES */
-
-.fees{
-  margin-top:11px;
-  padding:12px;
-  border:1px solid rgba(7,94,232,.14);
-  border-radius:13px;
-  background:linear-gradient(180deg,#fff,rgba(7,94,232,.018));
-}
-
-.fees h3{
-  margin-bottom:9px;
-  text-align:center;
-  font-size:14px;
-  font-weight:900;
-}
-
-.fee-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-}
-
-.fee-card{
-  position:relative;
-  overflow:hidden;
-  min-height:90px;
-  padding:13px 11px;
-  border:1px solid rgba(7,94,232,.14);
-  border-radius:12px;
-  background:#fff;
-  box-shadow:0 7px 18px rgba(9,12,18,.045);
-}
-
-.fee-card::before{
-  content:"";
-  position:absolute;
-  top:0;
-  right:0;
-  width:4px;
-  height:100%;
-  background:var(--blue);
-}
-
-.fee-card span{
-  display:block;
-  color:rgba(9,12,18,.55);
-  font-size:10.5px;
-  font-weight:800;
-}
-
-.fee-card strong{
-  display:flex;
-  align-items:baseline;
-  gap:4px;
-  margin-top:2px;
-  color:var(--blue);
-  font-size:26px;
-  font-weight:900;
-  line-height:1.25;
-}
-
-.fee-card strong small{
-  color:var(--b);
-  font-size:10px;
-  font-weight:800;
-}
-
-
-/* FORM */
-
-form{
-  display:grid;
-  gap:7px;
-}
-
-.card{
-  position:relative;
-  padding:14px 10px;
-  border-radius:15px;
-  transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;
-}
-
-.card:focus-within{
-  border-color:rgba(7,94,232,.28);
-  box-shadow:0 12px 30px rgba(7,94,232,.085);
-}
-
-.card::before{
-  content:"";
-  position:absolute;
-  top:0;
-  right:22px;
-  left:22px;
-  height:2px;
-  background:linear-gradient(90deg,transparent,var(--blue),transparent);
-}
-
-.card-head{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  margin-bottom:12px;
-  padding-bottom:9px;
-  border-bottom:1px solid rgba(9,12,18,.07);
-}
-
-.num{
-  display:grid;
-  place-items:center;
-  width:34px;
-  height:34px;
-  flex:none;
-  color:var(--w);
-  font-size:9px;
-  font-weight:900;
-  border-radius:9px;
-  background:var(--blue);
-}
-
-.card-head h2{
-  font-size:14.5px;
-  font-weight:900;
-}
-
-.fields{
-  display:grid;
-  gap:11px;
-}
-
-.field{
-  display:grid;
-  gap:5px;
-}
-
-label,
-.question{
-  color:var(--b);
-  font-size:12px;
-  font-weight:800;
-}
-
-.required{
-  color:var(--blue);
-}
-
-input,
-select{
-  width:100%;
-  min-height:46px;
-  padding:8px 10px;
-  color:var(--b);
-  font-size:15px;
-  outline:none;
-  border:1.5px solid rgba(9,12,18,.13);
-  border-radius:10px;
-  background:var(--w);
-  transition:.16s;
-}
-
-input::placeholder{
-  color:rgba(9,12,18,.30);
-}
-
-input:focus,
-select:focus{
-  border-color:var(--blue);
-  box-shadow:0 0 0 3px rgba(7,94,232,.07);
-}
-
-/* TEAM SIZE */
-
-.choices{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:6px;
-  margin-top:5px;
-}
-
-.choice{
-  position:relative;
-}
-
-.choice input{
-  position:absolute;
-  opacity:0;
-  width:1px;
-  height:1px;
-}
-
-.choice label{
-  display:grid;
-  place-items:center;
-  min-height:45px;
-  cursor:pointer;
-  border:1.5px solid rgba(9,12,18,.12);
-  border-radius:10px;
-  transition:.15s;
-}
-
-.choice input:checked + label{
-  color:var(--w);
-  border-color:var(--blue);
-  background:var(--blue);
-  box-shadow:0 6px 15px rgba(7,94,232,.18);
-}
-
-/* MEMBER */
-
-.member{
-  display:none;
-  margin-top:7px;
-  padding:9px;
-  border:1px solid rgba(7,94,232,.12);
-  border-radius:10px;
-  background:rgba(7,94,232,.025);
-}
-
-.member.show{
-  display:grid;
-  gap:5px;
-  animation:show .2s ease;
-}
-
-/* CONFIRM */
-
-.confirm{
-  display:flex;
-  align-items:flex-start;
-  gap:8px;
-  margin-top:12px;
-  padding:10px;
-  border:1px solid rgba(7,94,232,.15);
-  border-radius:10px;
-  background:rgba(7,94,232,.03);
-}
-
-.confirm input{
-  appearance:none;
-  width:20px;
-  height:20px;
-  min-width:20px;
-  min-height:20px;
-  padding:0;
-  margin-top:1px;
-  border:2px solid var(--blue);
-  border-radius:5px;
-}
-
-.confirm input:checked{
-  position:relative;
-  background:var(--blue);
-}
-
-.confirm input:checked::after{
-  content:"";
-  position:absolute;
-  top:3px;
-  left:3px;
-  width:8px;
-  height:5px;
-  border-left:2px solid var(--w);
-  border-bottom:2px solid var(--w);
-  transform:rotate(-45deg);
-}
-
-.confirm label{
-  font-size:10.8px;
-  line-height:1.6;
-}
-
-/* BUTTON */
-
-.submit{
-  width:100%;
-  min-height:51px;
-  margin-top:11px;
-  cursor:pointer;
-  color:var(--w);
-  font-size:13px;
-  font-weight:900;
-  border:0;
-  border-radius:10px;
-  background:var(--blue);
-  box-shadow:0 8px 20px rgba(7,94,232,.22);
-  transition:.15s;
-}
-
-.submit:active{
-  transform:scale(.985);
-}
-
-.submit:disabled{
-  opacity:.7;
-}
-
-
-/* SECURITY */
-.form-message{
-  display:none;
-  margin-top:10px;
-  padding:10px 12px;
-  border-radius:10px;
-  font-size:11.5px;
-  font-weight:800;
-  line-height:1.7;
-}
+:root{--white:#fff;--black:#090c12;--blue:#075ee8;--red:#c81717}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body,input,select,button{font-family:"Tajawal",sans-serif}
+body{min-height:100vh;color:var(--black);background:var(--white);line-height:1.7;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(circle at 5% 18%,rgba(7,94,232,.09),transparent 20%),radial-gradient(circle at 96% 65%,rgba(7,94,232,.07),transparent 22%),linear-gradient(rgba(7,94,232,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(7,94,232,.045) 1px,transparent 1px);background-size:auto,auto,44px 44px,44px 44px}
+.page{width:min(calc(100% - 8px),700px);margin:auto;padding:4px 0 30px}
+.hero,.card{background:var(--white);border:1px solid rgba(7,94,232,.15);box-shadow:0 10px 28px rgba(9,12,18,.065)}
+.hero{overflow:hidden;margin-bottom:7px;border-radius:17px}
+.banner img{display:block;width:100%;height:auto}
+
+.code-section{padding:10px 10px 5px;direction:ltr}
+.editor{width:min(100%,390px);margin:auto;overflow:hidden;border:1px solid rgba(7,94,232,.18);border-radius:12px;background:var(--white)}
+.editor-head{display:flex;align-items:center;justify-content:space-between;height:25px;padding:0 9px;border-bottom:1px solid rgba(9,12,18,.07)}
+.dots{display:flex;gap:4px}
+.dots i{width:5px;height:5px;border-radius:50%;background:var(--blue)}
+.dots i:nth-child(2){background:var(--black);opacity:.25}
+.dots i:nth-child(3){background:var(--black)}
+.editor-head span{color:rgba(9,12,18,.45);font:700 8px monospace}
+.code-body{padding:7px 9px 10px;font-family:Consolas,monospace}
+.code-line{display:flex;align-items:center;min-height:23px;font-size:clamp(9px,3vw,12px);white-space:nowrap}
+.line-number{width:23px;flex:none;color:rgba(9,12,18,.24);font-size:8px}
+.blue{color:var(--blue)}
+.include{color:rgba(9,12,18,.48)}
+.typing{display:inline-block;width:0;overflow:hidden;color:var(--black);font-weight:700;white-space:nowrap;border-right:2px solid var(--blue);animation:type 4.4s steps(25,end) infinite,blink .55s step-end infinite}
+
+.hero-info{padding:8px 11px 14px}
+.description{color:rgba(9,12,18,.68);font-size:13px;font-weight:600;line-height:1.85}
+.description strong{color:var(--black);font-weight:800}
+.registration-notice,.location{display:flex;align-items:center;gap:8px;margin-top:11px;padding:10px 11px;border:1px solid rgba(7,94,232,.14);border-radius:11px;background:rgba(7,94,232,.035)}
+.registration-notice strong{flex:none;color:var(--blue);font-size:11.5px;font-weight:900}
+.registration-notice span{color:rgba(9,12,18,.65);font-size:10.8px;font-weight:700;line-height:1.55}
+.location{gap:9px;padding:9px 10px}
+.pin{position:relative;width:34px;height:34px;min-width:34px;border-radius:9px;background:var(--blue)}
+.pin::after{content:"";position:absolute;top:8px;left:9px;width:9px;height:9px;border:3px solid var(--white);border-radius:50% 50% 50% 0;transform:rotate(-45deg)}
+.location strong{font-size:11.3px;font-weight:800}
+
+.schedule{margin-top:11px;padding:14px 9px 11px;border:1px solid rgba(7,94,232,.14);border-radius:13px}
+.schedule h3{margin-bottom:12px;text-align:center;font-size:17px;font-weight:900;line-height:1.4}
+.timeline{position:relative;display:grid;gap:6px}
+.timeline::before{content:"";position:absolute;top:17px;right:17px;bottom:17px;width:2px;background:rgba(7,94,232,.14)}
+.step{position:relative;z-index:1;display:grid;grid-template-columns:36px minmax(0,1fr);align-items:center;gap:8px}
+.step-number{display:grid;place-items:center;width:36px;height:36px;color:var(--white);font-size:10.5px;font-weight:900;border-radius:50%;background:var(--blue);box-shadow:0 0 0 4px var(--white)}
+.step-content{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:9px;min-height:59px;padding:9px 10px;border:1px solid rgba(9,12,18,.075);border-radius:10px;background:var(--white)}
+.step-content strong{font-size:clamp(13px,3.6vw,14.5px);font-weight:800;line-height:1.5}
+.time{display:flex;flex-direction:row-reverse;align-items:center;gap:6px;color:var(--blue);font-size:clamp(13.5px,3.8vw,15px);font-weight:900;direction:ltr;white-space:nowrap}
+.time b{font-size:18px;line-height:1}
+
+.fees{margin-top:11px;padding:12px;border:1px solid rgba(7,94,232,.14);border-radius:13px;background:linear-gradient(180deg,#fff,rgba(7,94,232,.018))}
+.fees h3{margin-bottom:9px;text-align:center;font-size:14px;font-weight:900}
+.fee-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fee-card{position:relative;overflow:hidden;min-height:90px;padding:13px 11px;border:1px solid rgba(7,94,232,.14);border-radius:12px;background:#fff;box-shadow:0 7px 18px rgba(9,12,18,.045)}
+.fee-card::before{content:"";position:absolute;top:0;right:0;width:4px;height:100%;background:var(--blue)}
+.fee-card span{display:block;color:rgba(9,12,18,.55);font-size:10.5px;font-weight:800}
+.fee-card strong{display:flex;align-items:baseline;gap:4px;margin-top:2px;color:var(--blue);font-size:26px;font-weight:900;line-height:1.25}
+.fee-card small{color:var(--black);font-size:10px;font-weight:800}
+
+form{display:grid;gap:7px}
+.card{position:relative;padding:14px 10px;border-radius:15px;transition:.16s}
+.card:focus-within{border-color:rgba(7,94,232,.28);box-shadow:0 12px 30px rgba(7,94,232,.085)}
+.card::before{content:"";position:absolute;top:0;right:22px;left:22px;height:2px;background:linear-gradient(90deg,transparent,var(--blue),transparent)}
+.card-head{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:9px;border-bottom:1px solid rgba(9,12,18,.07)}
+.num{display:grid;place-items:center;width:34px;height:34px;flex:none;color:var(--white);font-size:9px;font-weight:900;border-radius:9px;background:var(--blue)}
+.card-head h2{font-size:14.5px;font-weight:900}
+.fields{display:grid;gap:11px}
+.field{display:grid;gap:5px}
+label,.question{color:var(--black);font-size:12px;font-weight:800}
+.required{color:var(--blue)}
+input,select{width:100%;min-height:46px;padding:8px 10px;color:var(--black);font-size:15px;outline:none;border:1.5px solid rgba(9,12,18,.13);border-radius:10px;background:var(--white);transition:.16s}
+input::placeholder{color:rgba(9,12,18,.30)}
+input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(7,94,232,.07)}
+
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:5px}
+.choice{position:relative}
+.choice input{position:absolute;opacity:0;width:1px;height:1px}
+.choice label{display:grid;place-items:center;min-height:45px;cursor:pointer;border:1.5px solid rgba(9,12,18,.12);border-radius:10px;transition:.15s}
+.choice input:checked+label{color:var(--white);border-color:var(--blue);background:var(--blue);box-shadow:0 6px 15px rgba(7,94,232,.18)}
+.member{display:none;margin-top:7px;padding:9px;border:1px solid rgba(7,94,232,.12);border-radius:10px;background:rgba(7,94,232,.025)}
+.member.show{display:grid;gap:5px;animation:show .2s ease}
+
+.confirm{display:flex;align-items:flex-start;gap:8px;margin-top:12px;padding:10px;border:1px solid rgba(7,94,232,.15);border-radius:10px;background:rgba(7,94,232,.03)}
+.confirm input{appearance:none;width:20px;height:20px;min-width:20px;min-height:20px;padding:0;margin-top:1px;border:2px solid var(--blue);border-radius:5px}
+.confirm input:checked{position:relative;background:var(--blue)}
+.confirm input:checked::after{content:"";position:absolute;top:3px;left:3px;width:8px;height:5px;border-left:2px solid var(--white);border-bottom:2px solid var(--white);transform:rotate(-45deg)}
+.confirm label{font-size:10.8px;line-height:1.6}
+
+.form-message{display:none;margin-top:10px;padding:10px 12px;border-radius:10px;font-size:11.5px;font-weight:800;line-height:1.7}
 .form-message.show{display:block}
-.form-message.error{
-  color:#8b1111;
-  border:1px solid rgba(139,17,17,.18);
-  background:rgba(139,17,17,.055);
-}
-.form-message.info{
-  color:var(--blue);
-  border:1px solid rgba(7,94,232,.16);
-  background:rgba(7,94,232,.045);
-}
-.success-note{
-  margin-top:15px;
-  padding:11px 13px;
-  color:var(--blue);
-  font-size:12px;
-  font-weight:900;
-  border:1px solid rgba(7,94,232,.14);
-  border-radius:11px;
-  background:rgba(7,94,232,.045);
-}
+.form-message.error{color:var(--red);border:1px solid rgba(200,23,23,.2);background:rgba(200,23,23,.06)}
+.submit{width:100%;min-height:51px;margin-top:11px;cursor:pointer;color:var(--white);font-size:13px;font-weight:900;border:0;border-radius:10px;background:var(--blue);box-shadow:0 8px 20px rgba(7,94,232,.22);transition:.15s}
+.submit:active{transform:scale(.985)}
+.submit:disabled{opacity:.7}
+.submit-loading{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.submit-loading::before{content:"";width:14px;height:14px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite}
 
-.submit-loading{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-}
+footer{padding:20px 5px 7px;text-align:center;color:rgba(9,12,18,.48);font-size:10px}
+footer strong{display:block;color:var(--black);font-size:11.5px}
 
-.submit-loading::before{
-  content:"";
-  width:14px;
-  height:14px;
-  border:2px solid rgba(255,255,255,.45);
-  border-top-color:#fff;
-  border-radius:50%;
-  animation:spin .65s linear infinite;
-}
+.success{display:grid;place-items:center;min-height:100vh;padding:12px}
+.success[hidden]{display:none}
+.success-box{width:min(100%,480px);padding:36px 22px;text-align:center;border:1px solid rgba(7,94,232,.15);border-radius:20px;background:var(--white);box-shadow:0 16px 45px rgba(9,12,18,.10)}
+.check{position:relative;width:68px;height:68px;margin:0 auto 17px;border:2px solid var(--blue);border-radius:50%}
+.check::after{content:"";position:absolute;top:22px;left:18px;width:25px;height:13px;border-left:5px solid var(--blue);border-bottom:5px solid var(--blue);transform:rotate(-45deg)}
+.success-kicker{display:inline-block;margin-bottom:8px;color:var(--blue);font-size:10px;font-weight:900;letter-spacing:.8px}
+.success h2{direction:ltr;font-size:24px;font-weight:900}
+.success h2 span{color:var(--blue)}
+.success p{margin-top:6px;color:rgba(9,12,18,.58);font-size:12px}
+.success-note{margin-top:15px;padding:11px 13px;color:var(--blue);font-size:12px;font-weight:900;border:1px solid rgba(7,94,232,.14);border-radius:11px;background:rgba(7,94,232,.045)}
 
-/* FOOTER */
-
-footer{
-  padding:20px 5px 7px;
-  text-align:center;
-  color:rgba(9,12,18,.48);
-  font-size:10px;
-}
-
-footer strong{
-  display:block;
-  color:var(--b);
-  font-size:11.5px;
-}
-
-/* SUCCESS */
-
-.success{
-  display:grid;
-  place-items:center;
-  min-height:100vh;
-  padding:12px;
-}
-
-.success[hidden]{
-  display:none;
-}
-
-.success-box{
-  width:min(100%,480px);
-  padding:36px 22px;
-  text-align:center;
-  border:1px solid rgba(7,94,232,.15);
-  border-radius:20px;
-  background:var(--w);
-  box-shadow:0 16px 45px rgba(9,12,18,.10);
-}
-
-.check{
-  position:relative;
-  width:68px;
-  height:68px;
-  margin:0 auto 17px;
-  border:2px solid var(--blue);
-  border-radius:50%;
-}
-
-.check::after{
-  content:"";
-  position:absolute;
-  top:22px;
-  left:18px;
-  width:25px;
-  height:13px;
-  border-left:5px solid var(--blue);
-  border-bottom:5px solid var(--blue);
-  transform:rotate(-45deg);
-}
-
-.success h2{
-  direction:ltr;
-  font-size:24px;
-  font-weight:900;
-}
-
-.success-kicker{
-  display:inline-block;
-  margin-bottom:8px;
-  color:var(--blue);
-  font-size:10px;
-  font-weight:900;
-  letter-spacing:.8px;
-}
-
-.success h2 span{
-  color:var(--blue);
-}
-
-.success p{
-  margin-top:6px;
-  color:rgba(9,12,18,.58);
-  font-size:12px;
-}
-
-.another{
-  width:100%;
-  min-height:48px;
-  margin-top:18px;
-  color:var(--w);
-  font-weight:900;
-  border:0;
-  border-radius:10px;
-  background:var(--blue);
-}
-
-/* DESKTOP */
-
+@media(max-width:430px){.registration-notice{align-items:flex-start;flex-wrap:wrap;gap:3px 7px}}
 @media(min-width:650px){
-
-  .page{
-    width:min(calc(100% - 20px),720px);
-    padding-top:10px;
-  }
-
-  .two{
-    grid-template-columns:1fr 1fr;
-  }
-
-  .card{
-    padding:19px 17px;
-  }
-
-  .hero-info{
-    padding:10px 18px 18px;
-  }
-
-  .description{
-    font-size:14px;
-  }
-
-  .time{
-    font-size:14.5px;
-  }
-
-  .time b{
-    font-size:18px;
-  }
-
-  .timeline{
-    grid-template-columns:repeat(4,1fr);
-    gap:7px;
-  }
-
-  .timeline::before{
-    top:16px;
-    right:6%;
-    left:6%;
-    bottom:auto;
-    width:auto;
-    height:2px;
-  }
-
-  .step{
-    display:flex;
-    flex-direction:column;
-  }
-
-  .step-content{
-    width:100%;
-    min-height:96px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    text-align:center;
-  }
-
-  .step-content strong{
-    font-size:14px;
-  }
-
+  .page{width:min(calc(100% - 20px),720px);padding-top:10px}
+  .two{grid-template-columns:1fr 1fr}
+  .card{padding:19px 17px}
+  .hero-info{padding:10px 18px 18px}
+  .description{font-size:14px}
+  .timeline{grid-template-columns:repeat(4,1fr);gap:7px}
+  .timeline::before{top:18px;right:6%;left:6%;bottom:auto;width:auto;height:2px}
+  .step{display:flex;flex-direction:column}
+  .step-content{width:100%;min-height:96px;display:flex;flex-direction:column;justify-content:center;text-align:center}
+  .step-content strong{font-size:14px}
+  .time{font-size:14px}
+  .time b{font-size:18px}
 }
-
-/* ANIMATIONS */
-
-@keyframes type{
-  0%,10%{width:0}
-  58%,82%{width:25ch}
-  100%{width:0}
-}
-
-@keyframes blink{
-  50%{border-color:transparent}
-}
-
-@keyframes show{
-  from{opacity:0;transform:translateY(-4px)}
-  to{opacity:1;transform:none}
-}
-
-@keyframes spin{
-  to{transform:rotate(360deg)}
-}
-
-@media(prefers-reduced-motion:reduce){
-  *{animation:none!important}
-  .typing{width:auto}
-}
+@keyframes type{0%,10%{width:0}58%,82%{width:25ch}100%{width:0}}
+@keyframes blink{50%{border-color:transparent}}
+@keyframes show{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}.typing{width:auto}}
 </style>
 </head>
-
 <body>
-
 <main class="page" id="mainView">
+  <section class="hero">
+    <div class="banner"><img src="banner.png" alt="Divide and Conquer"></div>
 
-<!-- HERO -->
-
-<section class="hero">
-
-  <div class="banner">
-    <img src="banner.png" alt="Divide and Conquer">
-  </div>
-
-  <!-- C++ -->
-  <div class="code-section">
-
-    <div class="editor">
-
-      <div class="editor-head">
-
-        <div class="dots">
-          <i></i>
-          <i></i>
-          <i></i>
+    <div class="code-section">
+      <div class="editor">
+        <div class="editor-head">
+          <div class="dots"><i></i><i></i><i></i></div>
+          <span>C++</span>
         </div>
-
-        <span>C++</span>
-
+        <div class="code-body">
+          <div class="code-line"><span class="line-number">01</span><span class="include"><span class="blue">#include</span> &lt;iostream&gt;</span></div>
+          <div class="code-line"><span class="line-number">02</span><span class="typing">cout &lt;&lt; "READY TO CODE?";</span></div>
+        </div>
       </div>
-
-      <div class="code-body">
-
-        <div class="code-line">
-
-          <span class="line-number">01</span>
-
-          <span class="include">
-            <span class="blue">#include</span>
-            &lt;iostream&gt;
-          </span>
-
-        </div>
-
-        <div class="code-line">
-
-          <span class="line-number">02</span>
-
-          <span class="typing">
-            cout &lt;&lt; "READY TO CODE?";
-          </span>
-
-        </div>
-
-      </div>
-
     </div>
 
-  </div>
+    <div class="hero-info">
+      <p class="description">
+        يدعوكم <strong>IEEE An-Najah Student Branch</strong> بالتعاون مع <strong>IEEE Computer Society</strong>
+        للمشاركة في مسابقة <strong>Problem Solving</strong>، ضمن فرق مكوّنة من شخصين أو ثلاثة لحل مجموعة من التحديات البرمجية.
+      </p>
 
-
-  <div class="hero-info">
-
-    <p class="description">
-      يدعوكم
-      <strong>IEEE An-Najah Student Branch</strong>
-      بالتعاون مع
-      <strong>IEEE Computer Society</strong>
-      للمشاركة في مسابقة
-      <strong>Problem Solving</strong>،
-      ضمن فرق مكوّنة من شخصين أو ثلاثة لحل مجموعة من التحديات البرمجية.
-    </p>
-
-    <div class="registration-notice">
-      <strong>ملاحظة :</strong>
-      <span>
-     يجب على جميع أعضاء الفريق تعبئة الفورم وباستخدام نفس اسم الفريق. 
-      </span>
-    </div>
-
-
-    <div class="location">
-
-      <div class="pin"></div>
-
-      <strong>
-        كلية الهندسة – مختبرات الحاسوب، الطابق الثالث.
-      </strong>
-
-    </div>
-
-
-    <!-- TIMELINE -->
-
-    <section class="schedule">
-
-      <h3>جدول المسابقة</h3>
-
-      <div class="timeline">
-
-        <!-- 1 -->
-        <div class="step">
-
-          <div class="step-number">01</div>
-
-          <div class="step-content">
-
-            <strong>دفع رسوم المشاركة</strong>
-
-            <div class="time">
-
-              <span>09:00</span>
-
-              <b>←</b>
-
-              <span>10:00</span>
-
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <!-- 2 -->
-        <div class="step">
-
-          <div class="step-number">02</div>
-
-          <div class="step-content">
-
-            <strong>مدة المسابقة</strong>
-
-            <div class="time">
-
-              <span>10:00</span>
-
-              <b>←</b>
-
-              <span>01:00</span>
-
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <!-- 3 -->
-        <div class="step">
-
-          <div class="step-number">03</div>
-
-          <div class="step-content">
-
-            <strong>وجبة غداء ومشروبات</strong>
-
-            <div class="time">
-
-              <span>01:00</span>
-
-              <b>←</b>
-
-              <span>02:00</span>
-
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <!-- 4 -->
-        <div class="step">
-
-          <div class="step-number">04</div>
-
-          <div class="step-content">
-
-            <strong>
-              إعلان النتائج وتوزيع الجوائز
-            </strong>
-
-            <div class="time">
-              <span>02:00</span>
-            </div>
-
-          </div>
-
-        </div>
-
+      <div class="registration-notice">
+        <strong>ملاحظة :</strong>
+        <span>يجب على جميع أعضاء الفريق تعبئة الفورم وباستخدام نفس اسم الفريق.</span>
       </div>
 
-    </section>
+      <div class="location">
+        <div class="pin"></div>
+        <strong>كلية الهندسة – مختبرات الحاسوب، الطابق الثالث.</strong>
+      </div>
 
-    <section class="fees">
-      <h3>رسوم المشاركة</h3>
-
-      <div class="fee-grid">
-
-        <div class="fee-card">
-          <span>للمنتسبين</span>
-          <strong>
-            20
-            <small>شيكل</small>
-          </strong>
+      <section class="schedule">
+        <h3>جدول المسابقة</h3>
+        <div class="timeline">
+          <div class="step">
+            <div class="step-number">01</div>
+            <div class="step-content">
+              <strong>دفع رسوم المشاركة</strong>
+              <div class="time"><span>09:00</span><b>←</b><span>10:00</span></div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">02</div>
+            <div class="step-content">
+              <strong>مدة المسابقة</strong>
+              <div class="time"><span>10:00</span><b>←</b><span>01:00</span></div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">03</div>
+            <div class="step-content">
+              <strong>وجبة غداء ومشروبات</strong>
+              <div class="time"><span>01:00</span><b>←</b><span>02:00</span></div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">04</div>
+            <div class="step-content">
+              <strong>إعلان النتائج وتوزيع الجوائز</strong>
+              <div class="time"><span>02:00</span></div>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <div class="fee-card">
-          <span>لغير المنتسبين</span>
-          <strong>
-            25
-            <small>شيكل</small>
-          </strong>
+      <section class="fees">
+        <h3>رسوم المشاركة</h3>
+        <div class="fee-grid">
+          <div class="fee-card"><span>للمنتسبين</span><strong>20 <small>شيكل</small></strong></div>
+          <div class="fee-card"><span>لغير المنتسبين</span><strong>25 <small>شيكل</small></strong></div>
         </div>
+      </section>
+    </div>
+  </section>
 
+  <form id="registrationForm" novalidate>
+    <section class="card">
+      <div class="card-head"><div class="num">01</div><h2>بيانات التسجيل</h2></div>
+      <div class="fields two">
+        <div class="field">
+          <label>الاسم الكامل <span class="required">*</span></label>
+          <input name="FullName" type="text" autocomplete="name" maxlength="60" placeholder="أدخل اسمك الكامل" required>
+        </div>
+        <div class="field">
+          <label>التخصص <span class="required">*</span></label>
+          <input name="Major" type="text" maxlength="60" placeholder="مثال: هندسة الحاسوب" required>
+        </div>
+        <div class="field">
+          <label>السنة الدراسية <span class="required">*</span></label>
+          <select name="Year" required>
+            <option value="" disabled selected>اختر السنة</option>
+            <option>السنة الأولى</option>
+            <option>السنة الثانية</option>
+            <option>السنة الثالثة</option>
+            <option>السنة الرابعة</option>
+            <option>السنة الخامسة</option>
+            <option>دراسات عليا</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>رقم الواتساب مع مقدمة الدولة <span class="required">*</span></label>
+          <input name="Phone" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" maxlength="25" placeholder="+970599123456" required>
+        </div>
+        <div class="field">
+          <label>البريد الإلكتروني <span class="required">*</span></label>
+          <input name="Email" type="email" autocomplete="email" dir="ltr" inputmode="email" maxlength="120" placeholder="name@example.com" required>
+        </div>
       </div>
     </section>
 
-  </div>
-
-</section>
-
-
-<!-- FORM -->
-
-<form id="registrationForm" novalidate>
-<!-- BOX 1 -->
-
-  <section class="card">
-
-    <div class="card-head">
-
-      <div class="num">01</div>
-
-      <h2>بيانات التسجيل</h2>
-
-    </div>
-
-
-    <div class="fields two">
-
-
-      <div class="field">
-
-        <label>
-          الاسم الكامل
-          <span class="required">*</span>
-        </label>
-
-        <input
-          name="FullName"
-          type="text"
-          autocomplete="name"
-          maxlength="60"
-          placeholder="أدخل اسمك الكامل"
-          required
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          التخصص
-          <span class="required">*</span>
-        </label>
-
-        <input
-          name="Major"
-          type="text"
-          maxlength="60"
-          placeholder="مثال: هندسة الحاسوب"
-          required
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          السنة الدراسية
-          <span class="required">*</span>
-        </label>
-
-        <select name="Year" required>
-
-          <option value="" disabled selected>
-            اختر السنة
-          </option>
-
-          <option>السنة الأولى</option>
-          <option>السنة الثانية</option>
-          <option>السنة الثالثة</option>
-          <option>السنة الرابعة</option>
-          <option>السنة الخامسة</option>
-          <option>دراسات عليا</option>
-
-        </select>
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          رقم الواتساب مع مقدمة الدولة
-          <span class="required">*</span>
-        </label>
-
-        <input
-          name="Phone"
-          type="tel"
-          inputmode="tel"
-          autocomplete="tel"
-          dir="ltr"
-          maxlength="25"
-          placeholder="+970599123456"
-          required
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          البريد الإلكتروني
-          <span class="required">*</span>
-        </label>
-
-        <input
-          name="Email"
-          type="email"
-          autocomplete="email"
-          dir="ltr"
-          inputmode="email"
-          maxlength="120"
-          placeholder="name@example.com"
-          required
-        >
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- BOX 2 -->
-
-  <section class="card">
-
-    <div class="card-head">
-
-      <div class="num">02</div>
-
-      <h2>بيانات الفريق</h2>
-
-    </div>
-
-
-    <div class="fields">
-
-      <div class="field">
-
-        <label>
-          اسم الفريق
-          <span class="required">*</span>
-        </label>
-
-        <input
-          name="TeamName"
-          type="text"
-          maxlength="40"
-          placeholder="أدخل اسم الفريق"
-          required
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <div class="question">
-
-          عدد أعضاء الفريق
-          <span class="required">*</span>
-
+    <section class="card">
+      <div class="card-head"><div class="num">02</div><h2>بيانات الفريق</h2></div>
+      <div class="fields">
+        <div class="field">
+          <label>اسم الفريق <span class="required">*</span></label>
+          <input name="TeamName" type="text" maxlength="40" placeholder="أدخل اسم الفريق" required>
         </div>
-
-
-        <div class="choices">
-
-          <div class="choice">
-
-            <input
-              id="two"
-              name="TeamSize"
-              type="radio"
-              value="2"
-              required
-              checked
-            >
-
-            <label for="two">
-              شخصان
-            </label>
-
+        <div class="field">
+          <div class="question">عدد أعضاء الفريق <span class="required">*</span></div>
+          <div class="choices">
+            <div class="choice">
+              <input id="two" name="TeamSize" type="radio" value="2" required checked>
+              <label for="two">شخصان</label>
+            </div>
+            <div class="choice">
+              <input id="three" name="TeamSize" type="radio" value="3">
+              <label for="three">3 أشخاص</label>
+            </div>
           </div>
-
-
-          <div class="choice">
-
-            <input
-              id="three"
-              name="TeamSize"
-              type="radio"
-              value="3"
-            >
-
-            <label for="three">
-              3 أشخاص
-            </label>
-
-          </div>
-
         </div>
-
       </div>
 
-    </div>
+      <div class="member show" id="member2Box">
+        <label>اسم العضو الثاني <span class="required">*</span></label>
+        <input id="member2" name="Member2" type="text" maxlength="60" placeholder="الاسم الكامل للعضو الثاني" required>
+      </div>
 
+      <div class="member" id="member3Box">
+        <label>اسم العضو الثالث <span class="required">*</span></label>
+        <input id="member3" name="Member3" type="text" maxlength="60" placeholder="الاسم الكامل للعضو الثالث" disabled>
+      </div>
 
-    <!-- SECOND MEMBER -->
+      <div class="confirm">
+        <input id="confirm" name="Confirmation" type="checkbox" value="Confirmed" required>
+        <label for="confirm">أؤكد صحة معلومات الفريق والتزامنا بالمشاركة، وسنقوم بإبلاغ المنظمين مسبقًا في حال تعذّر الحضور.</label>
+      </div>
 
-    <div class="member show" id="member2Box">
+      <div class="form-message" id="formMessage" role="alert" aria-live="polite"></div>
+      <button class="submit" id="submitButton" type="submit"><span id="submitText">REGISTER TEAM &lt;/&gt;</span></button>
+    </section>
+  </form>
 
-      <label>
-        اسم العضو الثاني
-        <span class="required">*</span>
-      </label>
-
-      <input
-        id="member2"
-        name="Member2"
-        type="text"
-        maxlength="60"
-        placeholder="الاسم الكامل للعضو الثاني"
-        required
-      >
-
-    </div>
-
-
-    <!-- THIRD MEMBER -->
-
-    <div class="member" id="member3Box">
-
-      <label>
-        اسم العضو الثالث
-        <span class="required">*</span>
-      </label>
-
-      <input
-        id="member3"
-        name="Member3"
-        type="text"
-        maxlength="60"
-        placeholder="الاسم الكامل للعضو الثالث"
-        disabled
-      >
-
-    </div>
-
-
-    <!-- CONFIRM -->
-
-    <div class="confirm">
-
-      <input
-        id="confirm"
-        name="Confirmation"
-        type="checkbox"
-        value="Confirmed"
-        required
-      >
-
-      <label for="confirm">
-
-        أؤكد صحة معلومات الفريق والتزامنا بالمشاركة،
-        وسنقوم بإبلاغ المنظمين مسبقًا في حال تعذّر الحضور.
-
-      </label>
-
-    </div>
-
-
-    <div class="form-message" id="formMessage" role="alert" aria-live="polite"></div>
-
-    <button
-      class="submit"
-      id="submitButton"
-      type="submit"
-    >
-
-      <span id="submitText">
-        REGISTER TEAM &lt;/&gt;
-      </span>
-
-    </button>
-
-  </section>
-
-</form>
-
-
-<footer>
-
-  <strong>
-    IEEE An-Najah Student Branch
-  </strong>
-
-  IEEE Computer Society
-
-</footer>
-
+  <footer><strong>IEEE An-Najah Student Branch</strong>IEEE Computer Society</footer>
 </main>
 
-
-<!-- SUCCESS -->
-
 <section class="success" id="successView" hidden>
-
   <div class="success-box">
-
     <div class="check"></div>
-
     <span class="success-kicker">REGISTRATION COMPLETE</span>
-
-    <h2>
-      TEAM <span>REGISTERED.</span>
-    </h2>
-
-    <p id="successText">
-      شكراً لتسجيلكم! نتمنى لكم تجربة قوية وموفقة .
-    </p>
-
-    <div class="success-note">تم استلام التسجيل بنجاح ✓</div>
-
+    <h2>TEAM <span>REGISTERED.</span></h2>
+    <p id="successText">شكراً لتسجيلكم! نتمنى لكم تجربة قوية وموفقة.</p>
+    <div class="success-note">تم التسجيل بنجاح ✓</div>
   </div>
-
 </section>
-
 
 <script>
 "use strict";
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMFUEUcNulF0sGDZRErJ5wDdP4W2jhvfobbH4EcZx_53-jxy4pUfmdS5XOJaxjqbTNSw/exec";
-const DEVICE_KEY = "psc_device_id_v5";
-const LOCK_KEY = "psc_registration_lock_v5";
-const COOKIE_LOCK = "psc_registered_v5";
-const LOADING_TIME = 1000;
-const QUICK_CHECK_TIMEOUT = 650;
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbwMFUEUcNulF0sGDZRErJ5wDdP4W2jhvfobbH4EcZx_53-jxy4pUfmdS5XOJaxjqbTNSw/exec";
+const DEVICE_KEY="psc_device_id_v5",LOCK_KEY="psc_registration_lock_v5",COOKIE_LOCK="psc_registered_v5";
+const LOADING_TIME=1000,QUICK_CHECK_TIMEOUT=650;
+const $=id=>document.getElementById(id),sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 
-const $ = id => document.getElementById(id);
-const form = $("registrationForm");
-const mainView = $("mainView");
-const successView = $("successView");
-const submitButton = $("submitButton");
-const submitText = $("submitText");
-const formMessage = $("formMessage");
-const successText = $("successText");
-const member2 = $("member2");
-const member3 = $("member3");
-const member2Box = $("member2Box");
-const member3Box = $("member3Box");
+const form=$("registrationForm"),mainView=$("mainView"),successView=$("successView");
+const submitButton=$("submitButton"),submitText=$("submitText"),formMessage=$("formMessage"),successText=$("successText");
+const member2=$("member2"),member3=$("member3"),member2Box=$("member2Box"),member3Box=$("member3Box");
 
-const trimValue = value => String(value ?? "").trim();
-const normalizeEmail = value => trimValue(value).toLowerCase();
-const sleep = ms => new Promise(resolve => setTimeout(resolve,ms));
+const trim=value=>String(value??"").trim();
+const normalizeEmail=value=>trim(value).toLowerCase();
 
 function toEnglishDigits(value){
-  const arabic = "٠١٢٣٤٥٦٧٨٩";
-  const persian = "۰۱۲۳۴۵۶۷۸۹";
-  return String(value ?? "")
-    .replace(/[٠-٩]/g,d => arabic.indexOf(d))
-    .replace(/[۰-۹]/g,d => persian.indexOf(d));
+  const ar="٠١٢٣٤٥٦٧٨٩",fa="۰۱۲۳۴۵۶۷۸۹";
+  return String(value??"").replace(/[٠-٩]/g,d=>ar.indexOf(d)).replace(/[۰-۹]/g,d=>fa.indexOf(d));
 }
 
 function normalizePhone(value){
-  let phone = toEnglishDigits(value).trim().replace(/[\s\-().]/g,"");
-  if(phone.startsWith("00")) phone = "+" + phone.slice(2);
+  let phone=toEnglishDigits(value).trim().replace(/[\s\-().]/g,"");
+  if(phone.startsWith("00")) phone="+"+phone.slice(2);
   return phone;
 }
 
 function validEmail(email){
-  const parts = email.split("@");
-  return parts.length === 2 && parts[0] && parts[1] && !email.includes(" ") && email.length <= 150;
+  const parts=email.split("@");
+  return parts.length===2&&parts[0]&&parts[1]&&!email.includes(" ")&&email.length<=150;
 }
 
-function validPhone(phone){
-  return /^\+?\d{7,18}$/.test(phone);
-}
+const validPhone=phone=>/^\+?\d{7,18}$/.test(phone);
 
-function setMessage(text){
-  formMessage.textContent = text;
-  formMessage.className = "form-message show error";
-}
-
-function clearMessage(){
-  formMessage.textContent = "";
-  formMessage.className = "form-message";
-}
+function setMessage(text){formMessage.textContent=text;formMessage.className="form-message show error"}
+function clearMessage(){formMessage.textContent="";formMessage.className="form-message"}
 
 function newId(){
   if(crypto.randomUUID) return crypto.randomUUID();
-  return [...crypto.getRandomValues(new Uint8Array(16))]
-    .map(b => b.toString(16).padStart(2,"0"))
-    .join("");
+  return [...crypto.getRandomValues(new Uint8Array(16))].map(b=>b.toString(16).padStart(2,"0")).join("");
 }
 
 function getCookie(name){
-  const item = document.cookie
-    .split("; ")
-    .find(row => row.startsWith(name + "="));
-  return item ? item.split("=").slice(1).join("=") : "";
+  const item=document.cookie.split("; ").find(row=>row.startsWith(name+"="));
+  return item?item.split("=").slice(1).join("="):"";
 }
 
 function setRegistrationCookie(){
-  document.cookie = `${COOKIE_LOCK}=1; Max-Age=315360000; Path=/; SameSite=Lax`;
+  document.cookie=`${COOKIE_LOCK}=1; Max-Age=315360000; Path=/; SameSite=Lax`;
 }
 
 async function getDeviceId(){
-  const signature = [
-    navigator.userAgent || "",
-    navigator.platform || "",
-    navigator.language || "",
-    Intl.DateTimeFormat().resolvedOptions().timeZone || "",
-    screen.width || 0,
-    screen.height || 0,
-    screen.colorDepth || 0,
-    window.devicePixelRatio || 1,
-    navigator.hardwareConcurrency || 0,
-    navigator.deviceMemory || 0,
-    navigator.maxTouchPoints || 0
+  const signature=[
+    navigator.userAgent||"",navigator.platform||"",navigator.language||"",
+    Intl.DateTimeFormat().resolvedOptions().timeZone||"",screen.width||0,screen.height||0,
+    screen.colorDepth||0,window.devicePixelRatio||1,navigator.hardwareConcurrency||0,
+    navigator.deviceMemory||0,navigator.maxTouchPoints||0
   ].join("|");
 
   try{
     if(crypto.subtle){
-      const bytes = new TextEncoder().encode(signature);
-      const digest = await crypto.subtle.digest("SHA-256",bytes);
-      const id = "fp_" + [...new Uint8Array(digest)]
-        .map(b => b.toString(16).padStart(2,"0"))
-        .join("");
+      const digest=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(signature));
+      const id="fp_"+[...new Uint8Array(digest)].map(b=>b.toString(16).padStart(2,"0")).join("");
       localStorage.setItem(DEVICE_KEY,id);
       return id;
     }
   }catch{}
 
-  let id = localStorage.getItem(DEVICE_KEY);
-  if(!id){
-    id = newId();
-    localStorage.setItem(DEVICE_KEY,id);
-  }
+  let id=localStorage.getItem(DEVICE_KEY);
+  if(!id){id=newId();localStorage.setItem(DEVICE_KEY,id)}
   return id;
 }
 
 function getLocalRegistration(){
   try{
-    const saved = JSON.parse(localStorage.getItem(LOCK_KEY) || "null");
+    const saved=JSON.parse(localStorage.getItem(LOCK_KEY)||"null");
     if(saved) return saved;
   }catch{}
-
-  return getCookie(COOKIE_LOCK) === "1" ? {registered:true} : null;
+  return getCookie(COOKIE_LOCK)==="1"?{registered:true}:null;
 }
 
 function saveLocalRegistration(data={}){
@@ -1584,195 +394,120 @@ function saveLocalRegistration(data={}){
 }
 
 function updateTeamFields(){
-  const size = form.TeamSize.value;
-  const show2 = size === "2" || size === "3";
-  const show3 = size === "3";
-
+  const size=form.TeamSize.value,show2=size==="2"||size==="3",show3=size==="3";
   member2Box.classList.toggle("show",show2);
   member3Box.classList.toggle("show",show3);
-  member2.disabled = !show2;
-  member2.required = show2;
-  member3.disabled = !show3;
-  member3.required = show3;
-
-  if(!show2) member2.value = "";
-  if(!show3) member3.value = "";
+  member2.disabled=!show2;
+  member2.required=show2;
+  member3.disabled=!show3;
+  member3.required=show3;
+  if(!show2) member2.value="";
+  if(!show3) member3.value="";
 }
 
-form.TeamSize.forEach(radio => radio.addEventListener("change",updateTeamFields));
-
 function buildPayload(deviceId){
-  const data = {
-    RequestId:newId(),
-    DeviceId:deviceId,
-    FullName:trimValue(form.FullName.value),
-    Major:trimValue(form.Major.value),
-    Year:form.Year.value,
-    Phone:normalizePhone(form.Phone.value),
-    Email:normalizeEmail(form.Email.value),
-    TeamName:trimValue(form.TeamName.value),
-    TeamSize:form.TeamSize.value,
-    Member2:trimValue(member2.value),
-    Member3:trimValue(member3.value),
-    Confirmation:form.Confirmation.checked ? "Confirmed" : ""
+  const data={
+    RequestId:newId(),DeviceId:deviceId,
+    FullName:trim(form.FullName.value),Major:trim(form.Major.value),Year:form.Year.value,
+    Phone:normalizePhone(form.Phone.value),Email:normalizeEmail(form.Email.value),
+    TeamName:trim(form.TeamName.value),TeamSize:form.TeamSize.value,
+    Member2:trim(member2.value),Member3:trim(member3.value),
+    Confirmation:form.Confirmation.checked?"Confirmed":""
   };
 
-  form.FullName.value = data.FullName;
-  form.Major.value = data.Major;
-  form.Phone.value = data.Phone;
-  form.Email.value = data.Email;
-  form.TeamName.value = data.TeamName;
-  member2.value = data.Member2;
-  member3.value = data.Member3;
+  form.FullName.value=data.FullName;
+  form.Major.value=data.Major;
+  form.Phone.value=data.Phone;
+  form.Email.value=data.Email;
+  form.TeamName.value=data.TeamName;
+  member2.value=data.Member2;
+  member3.value=data.Member3;
 
-  const required = [
-    [data.FullName,"اكتب الاسم الكامل."],
-    [data.Major,"اكتب التخصص."],
-    [data.Year,"اختر السنة الدراسية."],
-    [data.TeamName,"اكتب اسم الفريق."],
-    [data.Member2,"اكتب اسم العضو الثاني."]
+  const required=[
+    [data.FullName,"اكتب الاسم الكامل."],[data.Major,"اكتب التخصص."],[data.Year,"اختر السنة الدراسية."],
+    [data.TeamName,"اكتب اسم الفريق."],[data.Member2,"اكتب اسم العضو الثاني."]
   ];
-
-  for(const [value,message] of required){
-    if(!value) throw new Error(message);
-  }
-
-  if(!validPhone(data.Phone))
-    throw new Error("اكتب رقم واتساب صحيحًا مع مقدمة الدولة.");
-
-  if(!validEmail(data.Email))
-    throw new Error("اكتب بريدًا إلكترونيًا صحيحًا يحتوي على @.");
-
-  if(!["2","3"].includes(data.TeamSize))
-    throw new Error("اختر عدد أعضاء الفريق.");
-
-  if(data.TeamSize === "3" && !data.Member3)
-    throw new Error("اكتب اسم العضو الثالث.");
-
-  if(data.TeamSize === "2") data.Member3 = "";
-
-  if(data.Confirmation !== "Confirmed")
-    throw new Error("يجب تأكيد صحة المعلومات والالتزام بالمشاركة.");
-
+  for(const [value,message] of required) if(!value) throw new Error(message);
+  if(!validPhone(data.Phone)) throw new Error("اكتب رقم واتساب صحيحًا مع مقدمة الدولة.");
+  if(!validEmail(data.Email)) throw new Error("اكتب بريدًا إلكترونيًا صحيحًا يحتوي على @.");
+  if(!["2","3"].includes(data.TeamSize)) throw new Error("اختر عدد أعضاء الفريق.");
+  if(data.TeamSize==="3"&&!data.Member3) throw new Error("اكتب اسم العضو الثالث.");
+  if(data.TeamSize==="2") data.Member3="";
+  if(data.Confirmation!=="Confirmed") throw new Error("يجب تأكيد صحة المعلومات والالتزام بالمشاركة.");
   return data;
 }
 
 function jsonp(params,timeout=QUICK_CHECK_TIMEOUT){
-  return new Promise((resolve,reject) => {
-    const callback = "__psc_" + Date.now().toString(36) + Math.random().toString(36).slice(2);
-    const script = document.createElement("script");
+  return new Promise((resolve,reject)=>{
+    const callback="__psc_"+Date.now().toString(36)+Math.random().toString(36).slice(2);
+    const script=document.createElement("script");
+    const cleanup=()=>{delete window[callback];script.remove()};
+    const timer=setTimeout(()=>{cleanup();reject(new Error("timeout"))},timeout);
 
-    const cleanup = () => {
-      delete window[callback];
-      script.remove();
-    };
+    window[callback]=data=>{clearTimeout(timer);cleanup();resolve(data)};
+    script.onerror=()=>{clearTimeout(timer);cleanup();reject(new Error("network"))};
 
-    const timer = setTimeout(() => {
-      cleanup();
-      reject(new Error("timeout"));
-    },timeout);
-
-    window[callback] = data => {
-      clearTimeout(timer);
-      cleanup();
-      resolve(data);
-    };
-
-    const url = new URL(SCRIPT_URL);
-    Object.entries({...params,callback})
-      .forEach(([key,value]) => url.searchParams.set(key,String(value)));
-
-    script.onerror = () => {
-      clearTimeout(timer);
-      cleanup();
-      reject(new Error("network"));
-    };
-
-    script.src = url.toString();
+    const url=new URL(SCRIPT_URL);
+    Object.entries({...params,callback}).forEach(([key,value])=>url.searchParams.set(key,String(value)));
+    script.src=url.toString();
     document.head.appendChild(script);
   });
 }
 
 function queueRegistration(payload){
-  const body = JSON.stringify(payload);
-
+  const body=JSON.stringify(payload);
   if(navigator.sendBeacon){
-    const blob = new Blob([body],{type:"text/plain;charset=UTF-8"});
+    const blob=new Blob([body],{type:"text/plain;charset=UTF-8"});
     if(navigator.sendBeacon(SCRIPT_URL,blob)) return;
   }
-
-  fetch(SCRIPT_URL,{
-    method:"POST",
-    mode:"no-cors",
-    cache:"no-store",
-    keepalive:true,
-    headers:{"Content-Type":"text/plain;charset=utf-8"},
-    body
-  }).catch(error => console.error("Registration send failed:",error));
+  fetch(SCRIPT_URL,{method:"POST",mode:"no-cors",cache:"no-store",keepalive:true,headers:{"Content-Type":"text/plain;charset=utf-8"},body})
+    .catch(error=>console.error("Registration send failed:",error));
 }
 
 function showSuccess(already=false){
-  mainView.hidden = true;
-  successView.hidden = false;
-
-  successText.textContent = already
-    ? "تم استخدام هذا الجهاز للتسجيل مسبقًا. التسجيل متاح مرة واحدة فقط لكل شخص."
-    : "شكراً لتسجيلكم! تم اعتماد مشاركتكم في المسابقة. نتمنى لكم تجربة قوية وموفقة.";
-
+  mainView.hidden=true;
+  successView.hidden=false;
+  successText.textContent=already
+    ?"تم استخدام هذا الجهاز للتسجيل مسبقًا. التسجيل متاح مرة واحدة فقط لكل شخص."
+    :"شكراً لتسجيلكم! تم اعتماد مشاركتكم في المسابقة. نتمنى لكم تجربة قوية وموفقة.";
   window.scrollTo({top:0,behavior:"smooth"});
 }
 
 function showDuplicate(reason){
-  const messages = {
+  const messages={
     device:"هذا الجهاز استُخدم للتسجيل مسبقًا. التسجيل متاح مرة واحدة فقط.",
     phone:"رقم الواتساب هذا مسجّل مسبقًا.",
     email:"البريد الإلكتروني هذا مسجّل مسبقًا.",
     request:"هذا الطلب تم إرساله مسبقًا."
   };
-  setMessage(messages[reason] || "يوجد تسجيل سابق بهذه البيانات.");
+  setMessage(messages[reason]||"يوجد تسجيل سابق بهذه البيانات.");
 }
 
-form.addEventListener("submit",async event => {
+form.TeamSize.forEach(radio=>radio.addEventListener("change",updateTeamFields));
+
+form.addEventListener("submit",async event=>{
   event.preventDefault();
   clearMessage();
 
-  if(getLocalRegistration()){
-    showSuccess(true);
-    return;
-  }
+  if(getLocalRegistration()){showSuccess(true);return}
 
   let payload;
-  try{
-    const deviceId = await getDeviceId();
-    payload = buildPayload(deviceId);
-  }catch(error){
-    setMessage(error.message);
-    return;
-  }
+  try{payload=buildPayload(await getDeviceId())}
+  catch(error){setMessage(error.message);return}
 
-  if(navigator.onLine === false){
-    setMessage("لا يوجد اتصال بالإنترنت. تأكد من الشبكة ثم حاول مرة أخرى.");
-    return;
-  }
+  if(navigator.onLine===false){setMessage("لا يوجد اتصال بالإنترنت. تأكد من الشبكة ثم حاول مرة أخرى.");return}
 
-  const startedAt = performance.now();
-  submitButton.disabled = true;
-  submitText.textContent = "جاري التسجيل...";
+  const startedAt=performance.now();
+  submitButton.disabled=true;
+  submitText.textContent="جاري التسجيل...";
   submitText.classList.add("submit-loading");
 
   try{
-    let precheck = null;
-    try{
-      precheck = await jsonp({
-        action:"check",
-        Email:payload.Email,
-        Phone:payload.Phone,
-        DeviceId:payload.DeviceId
-      });
-    }catch{}
+    let precheck=null;
+    try{precheck=await jsonp({action:"check",Email:payload.Email,Phone:payload.Phone,DeviceId:payload.DeviceId})}catch{}
 
-    if(precheck?.status === "duplicate"){
-      if(precheck.reason === "device") saveLocalRegistration();
+    if(precheck?.status==="duplicate"){
+      if(precheck.reason==="device") saveLocalRegistration();
       showDuplicate(precheck.reason);
       return;
     }
@@ -1780,31 +515,25 @@ form.addEventListener("submit",async event => {
     saveLocalRegistration({RequestId:payload.RequestId});
     queueRegistration(payload);
 
-    const remaining = Math.max(0,LOADING_TIME - (performance.now() - startedAt));
+    const remaining=Math.max(0,LOADING_TIME-(performance.now()-startedAt));
     if(remaining) await sleep(remaining);
-
     showSuccess(false);
-
   }catch(error){
     console.error(error);
     setMessage("تعذّر إرسال التسجيل حاليًا. جرّب مرة أخرى.");
   }finally{
-    submitButton.disabled = false;
+    submitButton.disabled=false;
     submitText.classList.remove("submit-loading");
-    submitText.textContent = "REGISTER TEAM </>";
+    submitText.textContent="REGISTER TEAM </>";
   }
 });
 
 async function checkExistingDevice(){
-  if(getLocalRegistration()){
-    showSuccess(true);
-    return;
-  }
-
+  if(getLocalRegistration()){showSuccess(true);return}
   try{
-    const DeviceId = await getDeviceId();
-    const result = await jsonp({action:"check",DeviceId},1200);
-    if(result?.status === "duplicate" && result.reason === "device"){
+    const DeviceId=await getDeviceId();
+    const result=await jsonp({action:"check",DeviceId},1200);
+    if(result?.status==="duplicate"&&result.reason==="device"){
       saveLocalRegistration();
       showSuccess(true);
     }
@@ -1814,6 +543,5 @@ async function checkExistingDevice(){
 updateTeamFields();
 checkExistingDevice();
 </script>
-
 </body>
 </html>
