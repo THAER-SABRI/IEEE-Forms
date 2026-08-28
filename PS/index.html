@@ -1412,13 +1412,19 @@ footer strong{
 "use strict";
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMFUEUcNulF0sGDZRErJ5wDdP4W2jhvfobbH4EcZx_53-jxy4pUfmdS5XOJaxjqbTNSw/exec";
+
 const DEVICE_KEY = "psc_device_id_v5";
 const LOCK_KEY = "psc_registration_lock_v5";
 const COOKIE_LOCK = "psc_registered_v5";
-const LOADING_TIME = 1000;
-const QUICK_CHECK_TIMEOUT = 650;
+
+const MIN_LOADING_TIME = 1000;
+const PRECHECK_TIMEOUT = 3500;
+const INITIAL_CHECK_TIMEOUT = 5000;
+const STATUS_TIMEOUT = 10000;
+const STATUS_POLL_INTERVAL = 500;
 
 const $ = id => document.getElementById(id);
+
 const form = $("registrationForm");
 const mainView = $("mainView");
 const successView = $("successView");
@@ -1440,20 +1446,31 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve,ms));
 function toEnglishDigits(value){
   const arabic = "٠١٢٣٤٥٦٧٨٩";
   const persian = "۰۱۲۳۴۵۶۷۸۹";
+
   return String(value ?? "")
     .replace(/[٠-٩]/g,d => arabic.indexOf(d))
     .replace(/[۰-۹]/g,d => persian.indexOf(d));
 }
 
 function normalizePhone(value){
-  let phone = toEnglishDigits(value).trim().replace(/[\s\-().]/g,"");
-  if(phone.startsWith("00")) phone = "+" + phone.slice(2);
+  let phone = toEnglishDigits(value)
+    .trim()
+    .replace(/[\s\-().]/g,"");
+
+  if(phone.startsWith("00"))
+    phone = "+" + phone.slice(2);
+
   return phone;
 }
 
 function validEmail(email){
   const parts = email.split("@");
-  return parts.length === 2 && parts[0] && parts[1] && !email.includes(" ") && email.length <= 150;
+
+  return parts.length === 2 &&
+    parts[0] &&
+    parts[1] &&
+    !email.includes(" ") &&
+    email.length <= 150;
 }
 
 function validPhone(phone){
@@ -1471,7 +1488,9 @@ function clearMessage(){
 }
 
 function newId(){
-  if(crypto.randomUUID) return crypto.randomUUID();
+  if(crypto.randomUUID)
+    return crypto.randomUUID();
+
   return [...crypto.getRandomValues(new Uint8Array(16))]
     .map(b => b.toString(16).padStart(2,"0"))
     .join("");
@@ -1481,13 +1500,23 @@ function getCookie(name){
   const item = document.cookie
     .split("; ")
     .find(row => row.startsWith(name + "="));
-  return item ? item.split("=").slice(1).join("=") : "";
+
+  return item
+    ? item.split("=").slice(1).join("=")
+    : "";
 }
 
 function setRegistrationCookie(){
-  document.cookie = `${COOKIE_LOCK}=1; Max-Age=315360000; Path=/; SameSite=Lax`;
+  document.cookie =
+    `${COOKIE_LOCK}=1; Max-Age=315360000; Path=/; SameSite=Lax`;
 }
 
+/*
+  مهم:
+  هذا الـDeviceId لا يعتمد على localStorage وحده.
+  يتم توليده من خصائص ثابتة نسبيًا في الجهاز/المتصفح،
+  لذلك حذف بيانات الموقع لا يغيّره عادةً.
+*/
 async function getDeviceId(){
   const signature = [
     navigator.userAgent || "",
@@ -1507,53 +1536,90 @@ async function getDeviceId(){
     if(crypto.subtle){
       const bytes = new TextEncoder().encode(signature);
       const digest = await crypto.subtle.digest("SHA-256",bytes);
-      const id = "fp_" + [...new Uint8Array(digest)]
-        .map(b => b.toString(16).padStart(2,"0"))
-        .join("");
+
+      const id =
+        "fp_" +
+        [...new Uint8Array(digest)]
+          .map(b => b.toString(16).padStart(2,"0"))
+          .join("");
+
       localStorage.setItem(DEVICE_KEY,id);
       return id;
     }
   }catch{}
 
+  /*
+    احتياط فقط للمتصفحات القديمة.
+    نحافظ على القيمة السابقة إن كانت موجودة.
+  */
   let id = localStorage.getItem(DEVICE_KEY);
+
   if(!id){
     id = newId();
     localStorage.setItem(DEVICE_KEY,id);
   }
+
   return id;
 }
 
 function getLocalRegistration(){
   try{
-    const saved = JSON.parse(localStorage.getItem(LOCK_KEY) || "null");
-    if(saved) return saved;
+    const saved =
+      JSON.parse(localStorage.getItem(LOCK_KEY) || "null");
+
+    if(saved)
+      return saved;
   }catch{}
 
-  return getCookie(COOKIE_LOCK) === "1" ? {registered:true} : null;
+  return getCookie(COOKIE_LOCK) === "1"
+    ? {registered:true}
+    : null;
 }
 
 function saveLocalRegistration(data={}){
-  localStorage.setItem(LOCK_KEY,JSON.stringify({registered:true,...data}));
+  localStorage.setItem(
+    LOCK_KEY,
+    JSON.stringify({
+      registered:true,
+      ...data
+    })
+  );
+
   setRegistrationCookie();
 }
 
 function updateTeamFields(){
   const size = form.TeamSize.value;
-  const show2 = size === "2" || size === "3";
-  const show3 = size === "3";
+
+  const show2 =
+    size === "2" ||
+    size === "3";
+
+  const show3 =
+    size === "3";
 
   member2Box.classList.toggle("show",show2);
   member3Box.classList.toggle("show",show3);
+
   member2.disabled = !show2;
   member2.required = show2;
+
   member3.disabled = !show3;
   member3.required = show3;
 
-  if(!show2) member2.value = "";
-  if(!show3) member3.value = "";
+  if(!show2)
+    member2.value = "";
+
+  if(!show3)
+    member3.value = "";
 }
 
-form.TeamSize.forEach(radio => radio.addEventListener("change",updateTeamFields));
+form.TeamSize.forEach(radio =>
+  radio.addEventListener(
+    "change",
+    updateTeamFields
+  )
+);
 
 function buildPayload(deviceId){
   const data = {
@@ -1568,7 +1634,10 @@ function buildPayload(deviceId){
     TeamSize:form.TeamSize.value,
     Member2:trimValue(member2.value),
     Member3:trimValue(member3.value),
-    Confirmation:form.Confirmation.checked ? "Confirmed" : ""
+    Confirmation:
+      form.Confirmation.checked
+        ? "Confirmed"
+        : ""
   };
 
   form.FullName.value = data.FullName;
@@ -1588,33 +1657,55 @@ function buildPayload(deviceId){
   ];
 
   for(const [value,message] of required){
-    if(!value) throw new Error(message);
+    if(!value)
+      throw new Error(message);
   }
 
   if(!validPhone(data.Phone))
-    throw new Error("اكتب رقم واتساب صحيحًا مع مقدمة الدولة.");
+    throw new Error(
+      "اكتب رقم واتساب صحيحًا مع مقدمة الدولة."
+    );
 
   if(!validEmail(data.Email))
-    throw new Error("اكتب بريدًا إلكترونيًا صحيحًا يحتوي على @.");
+    throw new Error(
+      "اكتب بريدًا إلكترونيًا صحيحًا يحتوي على @."
+    );
 
   if(!["2","3"].includes(data.TeamSize))
-    throw new Error("اختر عدد أعضاء الفريق.");
+    throw new Error(
+      "اختر عدد أعضاء الفريق."
+    );
 
-  if(data.TeamSize === "3" && !data.Member3)
-    throw new Error("اكتب اسم العضو الثالث.");
+  if(
+    data.TeamSize === "3" &&
+    !data.Member3
+  ){
+    throw new Error(
+      "اكتب اسم العضو الثالث."
+    );
+  }
 
-  if(data.TeamSize === "2") data.Member3 = "";
+  if(data.TeamSize === "2")
+    data.Member3 = "";
 
-  if(data.Confirmation !== "Confirmed")
-    throw new Error("يجب تأكيد صحة المعلومات والالتزام بالمشاركة.");
+  if(data.Confirmation !== "Confirmed"){
+    throw new Error(
+      "يجب تأكيد صحة المعلومات والالتزام بالمشاركة."
+    );
+  }
 
   return data;
 }
 
-function jsonp(params,timeout=QUICK_CHECK_TIMEOUT){
+function jsonp(params,timeout=PRECHECK_TIMEOUT){
   return new Promise((resolve,reject) => {
-    const callback = "__psc_" + Date.now().toString(36) + Math.random().toString(36).slice(2);
-    const script = document.createElement("script");
+    const callback =
+      "__psc_" +
+      Date.now().toString(36) +
+      Math.random().toString(36).slice(2);
+
+    const script =
+      document.createElement("script");
 
     const cleanup = () => {
       delete window[callback];
@@ -1633,8 +1724,15 @@ function jsonp(params,timeout=QUICK_CHECK_TIMEOUT){
     };
 
     const url = new URL(SCRIPT_URL);
-    Object.entries({...params,callback})
-      .forEach(([key,value]) => url.searchParams.set(key,String(value)));
+
+    Object
+      .entries({...params,callback})
+      .forEach(([key,value]) =>
+        url.searchParams.set(
+          key,
+          String(value ?? "")
+        )
+      );
 
     script.onerror = () => {
       clearTimeout(timer);
@@ -1647,22 +1745,47 @@ function jsonp(params,timeout=QUICK_CHECK_TIMEOUT){
   });
 }
 
-function queueRegistration(payload){
-  const body = JSON.stringify(payload);
-
-  if(navigator.sendBeacon){
-    const blob = new Blob([body],{type:"text/plain;charset=UTF-8"});
-    if(navigator.sendBeacon(SCRIPT_URL,blob)) return;
-  }
-
-  fetch(SCRIPT_URL,{
+async function sendRegistration(payload){
+  await fetch(SCRIPT_URL,{
     method:"POST",
     mode:"no-cors",
     cache:"no-store",
-    keepalive:true,
-    headers:{"Content-Type":"text/plain;charset=utf-8"},
-    body
-  }).catch(error => console.error("Registration send failed:",error));
+    headers:{
+      "Content-Type":
+        "text/plain;charset=utf-8"
+    },
+    body:JSON.stringify(payload)
+  });
+}
+
+async function waitForStatus(RequestId){
+  const startedAt = Date.now();
+
+  while(
+    Date.now() - startedAt <
+    STATUS_TIMEOUT
+  ){
+    try{
+      const result = await jsonp(
+        {
+          action:"status",
+          RequestId
+        },
+        3000
+      );
+
+      if(
+        result?.status &&
+        result.status !== "pending"
+      ){
+        return result;
+      }
+    }catch{}
+
+    await sleep(STATUS_POLL_INTERVAL);
+  }
+
+  throw new Error("status-timeout");
 }
 
 function hideInitialCheck(){
@@ -1675,20 +1798,52 @@ function showForm(){
   mainView.hidden = false;
 }
 
+function showInitialError(){
+  mainView.hidden = true;
+  successView.hidden = true;
+  initialCheck.hidden = false;
+
+  const box =
+    initialCheck.querySelector(
+      ".initial-check-box"
+    );
+
+  box.innerHTML = `
+    <span>
+      تعذّر تحميل نموذج التسجيل حاليًا.
+      تحقق من اتصال الإنترنت ثم حاول مرة أخرى.
+    </span>
+
+    <button
+      type="button"
+      class="submit"
+      onclick="location.reload()"
+    >
+      إعادة المحاولة
+    </button>
+  `;
+}
+
 function showSuccess(already=false){
   hideInitialCheck();
+
   mainView.hidden = true;
   successView.hidden = false;
 
-  successText.textContent = already
-    ? "يوجد تسجيل سابق. لا يمكن إرسال تسجيل آخر."
-    : "شكراً لتسجيلكم! نتمنى لكم تجربة قوية وموفقة.";
+  successText.textContent =
+    already
+      ? "يوجد تسجيل سابق. لا يمكن إرسال تسجيل آخر."
+      : "شكراً لتسجيلكم! نتمنى لكم تجربة قوية وموفقة.";
 
-  successNote.textContent = already
-    ? "التسجيل مكتمل ✓"
-    : "تم التسجيل بنجاح ✓";
+  successNote.textContent =
+    already
+      ? "التسجيل مكتمل ✓"
+      : "تم التسجيل بنجاح ✓";
 
-  window.scrollTo({top:0,behavior:"smooth"});
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
 }
 
 function showDuplicate(reason){
@@ -1699,98 +1854,251 @@ function showDuplicate(reason){
   }
 
   const messages = {
-    phone:"رقم الواتساب هذا مسجّل مسبقًا.",
-    email:"البريد الإلكتروني هذا مسجّل مسبقًا.",
-    request:"هذا الطلب تم إرساله مسبقًا."
+    phone:
+      "رقم الواتساب هذا مسجّل مسبقًا.",
+    email:
+      "البريد الإلكتروني هذا مسجّل مسبقًا.",
+    request:
+      "هذا الطلب تم إرساله مسبقًا."
   };
 
-  setMessage(messages[reason] || "يوجد تسجيل سابق بهذه البيانات.");
+  setMessage(
+    messages[reason] ||
+    "يوجد تسجيل سابق بهذه البيانات."
+  );
 }
 
-form.addEventListener("submit",async event => {
-  event.preventDefault();
-  clearMessage();
+form.addEventListener(
+  "submit",
+  async event => {
+    event.preventDefault();
+    clearMessage();
 
-  if(getLocalRegistration()){
-    showSuccess(true);
-    return;
-  }
-
-  let payload;
-  try{
-    const deviceId = await getDeviceId();
-    payload = buildPayload(deviceId);
-  }catch(error){
-    setMessage(error.message);
-    return;
-  }
-
-  if(navigator.onLine === false){
-    setMessage("لا يوجد اتصال بالإنترنت. تأكد من الشبكة ثم حاول مرة أخرى.");
-    return;
-  }
-
-  const startedAt = performance.now();
-  submitButton.disabled = true;
-  submitText.textContent = "جاري التسجيل...";
-  submitText.classList.add("submit-loading");
-
-  try{
-    let precheck = null;
-    try{
-      precheck = await jsonp({
-        action:"check",
-        Email:payload.Email,
-        Phone:payload.Phone,
-        DeviceId:payload.DeviceId
-      });
-    }catch{}
-
-    if(precheck?.status === "duplicate"){
-      showDuplicate(precheck.reason);
+    if(getLocalRegistration()){
+      showSuccess(true);
       return;
     }
 
-    saveLocalRegistration({RequestId:payload.RequestId});
-    queueRegistration(payload);
+    let payload;
 
-    const remaining = Math.max(0,LOADING_TIME - (performance.now() - startedAt));
-    if(remaining) await sleep(remaining);
+    try{
+      const deviceId =
+        await getDeviceId();
 
-    showSuccess(false);
+      payload =
+        buildPayload(deviceId);
+    }catch(error){
+      setMessage(error.message);
+      return;
+    }
 
-  }catch(error){
-    console.error(error);
-    setMessage("تعذّر إرسال التسجيل حاليًا. جرّب مرة أخرى.");
-  }finally{
-    submitButton.disabled = false;
-    submitText.classList.remove("submit-loading");
-    submitText.textContent = "REGISTER TEAM </>";
+    if(navigator.onLine === false){
+      setMessage(
+        "لا يوجد اتصال بالإنترنت. تأكد من الشبكة ثم حاول مرة أخرى."
+      );
+      return;
+    }
+
+    const startedAt =
+      performance.now();
+
+    submitButton.disabled = true;
+
+    submitText.textContent =
+      "جاري التسجيل...";
+
+    submitText.classList.add(
+      "submit-loading"
+    );
+
+    try{
+      /*
+        فحص سريع قبل الإرسال.
+        لو تعذر الفحص، لا مشكلة:
+        السيرفر يعيد فحص التكرار داخل doPost.
+      */
+      try{
+        const precheck =
+          await jsonp({
+            action:"check",
+            Email:payload.Email,
+            Phone:payload.Phone,
+            DeviceId:payload.DeviceId
+          });
+
+        if(
+          precheck?.status ===
+          "duplicate"
+        ){
+          showDuplicate(
+            precheck.reason
+          );
+          return;
+        }
+      }catch{}
+
+      /*
+        نرسل البيانات أولاً.
+      */
+      await sendRegistration(payload);
+
+      /*
+        ثم ننتظر تأكيد السيرفر.
+        لا يتم قفل التسجيل محليًا
+        ولا تظهر صفحة النجاح
+        إلا بعد status === success.
+      */
+      const result =
+        await waitForStatus(
+          payload.RequestId
+        );
+
+      const elapsed =
+        performance.now() -
+        startedAt;
+
+      const remaining =
+        Math.max(
+          0,
+          MIN_LOADING_TIME -
+          elapsed
+        );
+
+      if(remaining)
+        await sleep(remaining);
+
+      if(result.status === "success"){
+        saveLocalRegistration({
+          RequestId:
+            payload.RequestId,
+          RegistrationId:
+            result.RegistrationId || ""
+        });
+
+        showSuccess(false);
+        return;
+      }
+
+      if(
+        result.status ===
+        "duplicate"
+      ){
+        showDuplicate(
+          result.reason
+        );
+        return;
+      }
+
+      setMessage(
+        result.message ||
+        "تعذّر إكمال التسجيل. حاول مرة أخرى."
+      );
+
+    }catch(error){
+      console.error(error);
+
+      setMessage(
+        "تعذّر تأكيد حفظ التسجيل حاليًا. حاول مرة أخرى."
+      );
+
+    }finally{
+      submitButton.disabled = false;
+
+      submitText.classList.remove(
+        "submit-loading"
+      );
+
+      submitText.textContent =
+        "REGISTER TEAM </>";
+    }
   }
-});
+);
 
 async function initializeRegistrationPage(){
   updateTeamFields();
 
+  /*
+    القفل المحلي سريع فقط.
+  */
   if(getLocalRegistration()){
     showSuccess(true);
     return;
   }
 
-  try{
-    const DeviceId = await getDeviceId();
-    const result = await jsonp({action:"check",DeviceId},1500);
-
-    if(result?.status === "duplicate" && result.reason === "device"){
-      saveLocalRegistration();
-      showSuccess(true);
-      return;
-    }
-  }catch(error){
-    console.warn("Initial registration check unavailable:",error);
+  /*
+    لا نظهر الفورم قبل أن يرد السيرفر.
+    هذا مهم بعد حذف بيانات المتصفح.
+  */
+  if(navigator.onLine === false){
+    showInitialError();
+    return;
   }
 
-  showForm();
+  try{
+    const DeviceId =
+      await getDeviceId();
+
+    let lastError = null;
+
+    for(let attempt=0;attempt<2;attempt++){
+      try{
+        const result =
+          await jsonp(
+            {
+              action:"check",
+              DeviceId
+            },
+            INITIAL_CHECK_TIMEOUT
+          );
+
+        if(
+          result?.status ===
+          "duplicate"
+        ){
+          saveLocalRegistration();
+          showSuccess(true);
+          return;
+        }
+
+        if(
+          result?.status ===
+          "ok"
+        ){
+          showForm();
+          return;
+        }
+
+        lastError =
+          new Error(
+            result?.message ||
+            "check-error"
+          );
+
+      }catch(error){
+        lastError = error;
+      }
+
+      if(attempt === 0)
+        await sleep(500);
+    }
+
+    throw lastError ||
+      new Error("initial-check-failed");
+
+  }catch(error){
+    console.warn(
+      "Initial registration check unavailable:",
+      error
+    );
+
+    /*
+      Fail closed:
+      إذا لم نستطع التأكد من السيرفر
+      لا نظهر الفورم بدل السماح بتسجيل
+      قد يكون مكررًا.
+    */
+    showInitialError();
+  }
 }
 
 initializeRegistrationPage();
