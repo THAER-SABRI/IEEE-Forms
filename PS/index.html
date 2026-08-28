@@ -273,16 +273,17 @@ body::before{
 
 .schedule{
   margin-top:11px;
-  padding:12px 8px 9px;
+  padding:14px 9px 11px;
   border:1px solid rgba(7,94,232,.14);
   border-radius:13px;
 }
 
 .schedule h3{
-  margin-bottom:10px;
+  margin-bottom:12px;
   text-align:center;
-  font-size:14px;
+  font-size:17px;
   font-weight:900;
+  line-height:1.4;
 }
 
 .timeline{
@@ -305,18 +306,18 @@ body::before{
   position:relative;
   z-index:1;
   display:grid;
-  grid-template-columns:33px minmax(0,1fr);
+  grid-template-columns:36px minmax(0,1fr);
   align-items:center;
-  gap:7px;
+  gap:8px;
 }
 
 .step-number{
   display:grid;
   place-items:center;
-  width:33px;
-  height:33px;
+  width:36px;
+  height:36px;
   color:var(--w);
-  font-size:8px;
+  font-size:10.5px;
   font-weight:900;
   border-radius:50%;
   background:var(--blue);
@@ -327,17 +328,18 @@ body::before{
   display:grid;
   grid-template-columns:minmax(0,1fr) auto;
   align-items:center;
-  gap:7px;
-  min-height:51px;
-  padding:7px 9px;
+  gap:9px;
+  min-height:59px;
+  padding:9px 10px;
   border:1px solid rgba(9,12,18,.075);
   border-radius:10px;
   background:var(--w);
 }
 
 .step-content strong{
-  font-size:10.7px;
+  font-size:clamp(13px,3.6vw,14.5px);
   font-weight:800;
+  line-height:1.5;
 }
 
 /*
@@ -349,16 +351,16 @@ body::before{
   display:flex;
   flex-direction:row-reverse;
   align-items:center;
-  gap:5px;
+  gap:6px;
   color:var(--blue);
-  font-size:12px;
+  font-size:clamp(13.5px,3.8vw,15px);
   font-weight:900;
   direction:ltr;
   white-space:nowrap;
 }
 
 .time b{
-  font-size:15px;
+  font-size:18px;
   line-height:1;
 }
 
@@ -830,11 +832,11 @@ footer strong{
   }
 
   .time{
-    font-size:13px;
+    font-size:14.5px;
   }
 
   .time b{
-    font-size:16px;
+    font-size:18px;
   }
 
   .timeline{
@@ -858,11 +860,15 @@ footer strong{
 
   .step-content{
     width:100%;
-    min-height:85px;
+    min-height:96px;
     display:flex;
     flex-direction:column;
     justify-content:center;
     text-align:center;
+  }
+
+  .step-content strong{
+    font-size:14px;
   }
 
 }
@@ -1440,8 +1446,7 @@ footer strong{
     </h2>
 
     <p id="successText">
-      شكراً لتسجيلكم! تم اعتماد مشاركتكم في المسابقة.
-      نتمنى لكم تجربة قوية وموفقة.
+      شكراً لتسجيلكم! نتمنى لكم تجربة قوية وموفقة .
     </p>
 
     <div class="success-note">تم استلام التسجيل بنجاح ✓</div>
